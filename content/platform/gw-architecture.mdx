@@ -1,0 +1,63 @@
+---
+title: "Game Warden Architecture"
+description: "Detailed architecture of the Game Warden platform."
+roles: []
+---
+
+This page provides a deeper technical look at the Game Warden platform architecture, including the technology stack, component interactions, and data flow for a deployed application.
+
+## Technology Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Orchestration** | Kubernetes (EKS / GovCloud EKS) | Container scheduling, service discovery, health management |
+| **GitOps** | ArgoCD | Declarative deployment; all workloads defined as Git-managed manifests |
+| **Service Mesh** | Istio | mTLS, traffic management, observability |
+| **Registry** | Harbor | Container image storage, scanning, signing |
+| **Image Scanning** | Trivy (Harbor-integrated), Prisma Cloud (Twistlock) | CVE detection in images |
+| **SAST** | Semgrep | Static code and configuration analysis |
+| **Secrets** | HashiCorp Vault | Secrets injection, certificate management, dynamic credentials |
+| **Ingress** | NGINX Ingress Controller | External traffic routing, TLS termination |
+| **Metrics** | Prometheus + Grafana | Metrics collection, dashboards, alerting |
+| **Logging** | Loki + Grafana | Log aggregation and querying |
+| **Tracing** | Jaeger (available on request) | Distributed request tracing |
+| **Policy Enforcement** | OPA/Gatekeeper | Admission control, policy-as-code |
+| **Certificate Management** | cert-manager | Automatic TLS certificate provisioning and renewal |
+
+## Control Plane Architecture
+
+The Game Warden control plane is deployed in a dedicated management cluster, separated from tenant workloads. Key control plane components:
+
+### ArgoCD
+
+ArgoCD is the GitOps engine that manages all application deployments. When a tenant pushes an updated image and triggers a deployment, ArgoCD reconciles the desired state (defined in the tenant's Helm chart or Kustomize manifests) with the actual cluster state. Deployments are audited, rollback-capable, and recorded in ArgoCD's history.
+
+### HashiCorp Vault
+
+Vault handles all secrets on the platform. Secrets are never stored in Kubernetes Secrets objects or environment variables directly—they are injected at runtime via the Vault Agent Sidecar or via the Vault CSI driver. Dynamic database credentials (short-lived, auto-rotated) are available for tenants using GW managed PostgreSQL.
+
+### Harbor Registry
+
+Harbor stores all container images for all tenants. Images are organized by project (one project per organization). Harbor integrates with Trivy for on-push scanning and with Notary v2 for image signing. Only signed images that pass scanning are eligible for deployment.
+
+## Tenant Namespace Architecture
+
+Each tenant namespace includes the following Kubernetes resources (provisioned and managed by GW):
+
+- **NetworkPolicy**: Default deny-all ingress/egress with explicit allow rules for the tenant's defined service topology
+- **ResourceQuota**: Limits on total CPU, memory, PVC storage, and number of pods
+- **LimitRange**: Default resource requests/limits for containers that do not specify their own
+- **ServiceAccount**: Per-application service accounts with Vault role bindings for secrets access
+- **Istio PeerAuthentication**: Enforces mTLS for all traffic within the namespace (IL4/IL5)
+- **OPA/Gatekeeper constraints**: Enforces pod security standards (no root, no privilege, etc.)
+
+## Data Flow for a Deployed Application
+
+The following describes the path of a user request to a tenant application:
+
+1. **User request** arrives at the GW load balancer (AWS ALB or NLB depending on environment).
+2. **NGINX Ingress Controller** terminates TLS, inspects the request through the WAF rules, and routes to the appropriate tenant service based on hostname and path.
+3. **Istio sidecar (Envoy)** on the ingress pod enforces traffic policies and initiates mTLS to the destination pod.
+4. **Application pod** receives the request. Secrets (DB credentials, API keys) were injected at pod startup by the Vault Agent sidecar.
+5. **Response** travels back through Istio (where it is logged for observability), through NGINX, and back to the user.
+6. **Logs and metrics** from the application container (stdout/stderr) are collected by the Loki log agent and Prometheus scraper running on the same node, and stored in the shared observability stack.

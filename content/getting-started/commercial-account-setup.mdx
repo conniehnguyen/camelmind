@@ -1,0 +1,67 @@
+---
+title: "Commercial Account Setup"
+description: "Set up your account for Commercial deployment."
+roles: []
+---
+
+This page walks through the process of creating a Game Warden account, registering your organization, and setting up your first Commercial deployment environment.
+
+## Step 1: Register Your Account
+
+<Steps>
+  <Step n={1} title="Go to the Game Warden Portal">
+    Navigate to [portal.gamewarden.io](https://portal.gamewarden.io) and click **Sign Up**.
+  </Step>
+  <Step n={2} title="Enter Your Work Email">
+    Use your company email address. Personal email addresses are not permitted.
+  </Step>
+  <Step n={3} title="Verify Your Email">
+    Check your inbox for a verification email from Game Warden. Click the confirmation link to activate your account.
+  </Step>
+  <Step n={4} title="Set Up MFA">
+    Enroll in multi-factor authentication using a TOTP app or FIDO2 hardware key. MFA is required for all Game Warden accounts.
+  </Step>
+</Steps>
+
+## Step 2: Business Verification
+
+After creating your account, you must verify your business identity before you can create or join an organization. Game Warden requires:
+
+- A valid business domain matching your email address
+- Your organization's legal name
+- A brief description of your product and target use case
+
+Business verification is reviewed by the Second Front onboarding team and typically completes within 1 business day.
+
+<Callout type="note">
+  If your organization is already registered in Game Warden, select **Request to Join an Organization** instead of creating a new one. Your Org Admin will need to approve your request.
+</Callout>
+
+## Step 3: Billing Setup
+
+Commercial deployments are billed based on resource consumption (compute hours, storage, managed service usage). To activate billing:
+
+1. Navigate to **Organization Settings > Billing**.
+2. Click **Add Payment Method** and enter your payment information.
+3. Select a billing plan. Contact your Second Front account representative if you require invoiced billing or a purchase order.
+
+## Step 4: Invite Team Members
+
+<Steps>
+  <Step n={1} title="Navigate to Organization Settings">
+    Go to **Organization Settings > Members** in the portal.
+  </Step>
+  <Step n={2} title="Invite a Member">
+    Click **Invite Member**, enter the team member's work email, and select their role (Org Admin, Developer, or Read-Only).
+  </Step>
+  <Step n={3} title="Team Member Completes Registration">
+    The invited team member receives an email invitation and must complete account registration and MFA enrollment before accessing the organization.
+  </Step>
+</Steps>
+
+## Next Steps
+
+Once your account and organization are set up:
+- Review [Entrance Criteria](/getting-started/entrance-criteria) to ensure your application meets requirements
+- Submit your first application through App Central
+- See [Platform Architecture](/platform/architecture) for an overview of the environment your application will run in

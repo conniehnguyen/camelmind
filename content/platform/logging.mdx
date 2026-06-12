@@ -1,0 +1,69 @@
+---
+title: "Logging & Monitoring"
+description: "Logging, monitoring, and observability on Game Warden."
+roles: []
+---
+
+Game Warden provides a fully managed observability stack for all tenant applications, including centralized log aggregation, metrics collection, dashboards, and alerting. You do not need to deploy your own logging or monitoring infrastructure—it is provided as part of the platform.
+
+## How Logs Are Collected
+
+Game Warden uses a log agent (Promtail) deployed on each cluster node to collect logs from all running containers. Logs are sent to a central Loki instance where they are indexed and made available for querying.
+
+**Your application must write logs to stdout and stderr.** Logs written to files on the container filesystem will not be collected. This is a hard requirement—see [Technical Requirements](/getting-started/ec-technical) for details.
+
+Log format recommendations:
+- **Structured JSON is strongly preferred.** JSON logs are automatically parsed and indexed by field, making them much easier to query and filter in Grafana.
+- Include a `level` field (`info`, `warn`, `error`, `debug`) in every log entry.
+- Include a `timestamp` field in ISO 8601 format.
+- Include a `service` or `component` field to identify the source microservice.
+
+<Callout type="warning">
+  Do not log sensitive data to stdout or stderr. This includes passwords, API keys, session tokens, PII, or classified information. Logging sensitive data is a security finding that will block deployment.
+</Callout>
+
+## How to Access Your Logs
+
+Logs are accessible through Game Warden's Grafana instance, which is available to all organization members with Developer or Org Admin roles.
+
+1. Navigate to the Game Warden portal and click **Observability > Logs**.
+2. You will be redirected to the Grafana Loki explore interface, pre-filtered to your organization's namespaces.
+3. Use LogQL queries to filter and search your logs:
+   ```logql
+   {namespace="your-app-namespace"} |= "error"
+   ```
+4. Pre-built dashboards for common query patterns are available under **Dashboards > Application Logs**.
+
+## Metrics
+
+Game Warden's Prometheus instance scrapes metrics from all pods in tenant namespaces. To expose custom application metrics, your application should expose a `/metrics` endpoint in Prometheus format on a configurable port.
+
+Out-of-the-box metrics available for all applications (no configuration required):
+- CPU and memory usage per pod and container
+- Network I/O (bytes in/out)
+- Kubernetes workload health (pod restarts, pending pods)
+- HTTP request rate, latency, and error rate (via Istio sidecar, if service mesh is enabled)
+
+## Alerting
+
+Custom alerting rules can be configured in Grafana. Common alert templates are provided:
+
+| Alert Template | Trigger Condition |
+|---|---|
+| High error rate | HTTP 5xx rate > 5% over 5 minutes |
+| Pod crash looping | Pod restart count > 3 in 10 minutes |
+| High memory usage | Container memory > 90% of limit |
+| Disk usage (PVC) | PVC usage > 85% of capacity |
+
+To configure alerts for your application, submit a support ticket with your alerting requirements, or configure alerts directly in Grafana if your role has edit permissions.
+
+## Log Retention Policy
+
+| Environment | Retention Period |
+|---|---|
+| Commercial | 30 days |
+| FedRAMP | 90 days |
+| DoW (IL4) | 1 year |
+| DoW (IL5) | 3 years |
+
+Logs beyond the retention period are automatically purged. If you require longer retention for compliance reasons, contact your Second Front representative to discuss archival options.

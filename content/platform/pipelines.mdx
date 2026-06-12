@@ -1,0 +1,70 @@
+---
+title: "Pipelines & Tooling"
+description: "Platform CI/CD pipelines and security tooling."
+roles: []
+---
+
+Game Warden's automated pipeline enforces security requirements on every container image before it is eligible for deployment. Understanding the pipeline helps you build your own CI/CD workflow to integrate with GW's security controls.
+
+## Pipeline Overview
+
+Every container image deployed on Game Warden must pass through the following stages:
+
+```
+Push Image → Trivy Scan → SAST Analysis → Image Signing → ArgoCD Deploy
+```
+
+The pipeline is triggered automatically when you push a new image to the Game Warden Harbor registry. You can also trigger a manual pipeline run from App Central.
+
+## Pipeline Stages
+
+### Stage 1: Image Vulnerability Scan (Trivy / Prisma Cloud)
+
+When an image is pushed to Harbor, Trivy immediately scans the image for known CVEs in OS packages and application dependencies. For DoW (IL4/IL5) environments, an additional Prisma Cloud (Twistlock) scan is performed with DoD-specific compliance benchmarks.
+
+**Pass criteria:**
+- No Critical CVEs (unless accepted risk is on file)
+- High CVEs documented in POA&M or remediated
+
+**On failure:** The image is flagged in Harbor and in App Central. A new finding is created automatically. The image is blocked from deployment until the finding is addressed.
+
+### Stage 2: SAST Analysis (Semgrep)
+
+Static analysis scans your Kubernetes manifests, Helm charts, and Dockerfile configurations for security misconfigurations. Common SAST findings include:
+
+- Containers running as root
+- Missing resource limits
+- Hardcoded secrets in environment variables
+- Deprecated or insecure Kubernetes API versions
+- Missing network policies
+
+**On failure:** Findings are reported in App Central. Critical and High SAST findings block deployment.
+
+### Stage 3: Image Signing (Cosign / Notary v2)
+
+Images that pass all scans are cryptographically signed using Cosign. The signature proves that the image was scanned by the GW pipeline and has not been modified since signing. Game Warden's admission controller verifies image signatures at pod creation time—unsigned images cannot be scheduled.
+
+### Stage 4: ArgoCD Deployment
+
+After signing, ArgoCD reconciles the new image version into the target namespace. If a previous deployment is running, ArgoCD performs a rolling update, ensuring zero-downtime deployments (assuming appropriate liveness/readiness probes are configured).
+
+## What Happens When a Scan Fails
+
+1. **Automatic finding created** in App Central under the **Findings** tab with full scan output
+2. **Email notification sent** to all Developers and Org Admins for your organization
+3. **Deployment blocked** for the affected image version
+4. **Previous version continues running** (if one exists in the environment)
+
+You must remediate the finding or submit an accepted risk before the new image version can be deployed.
+
+## Viewing Pipeline Results in App Central
+
+To view pipeline results for your application:
+
+1. In App Central, open your application and click the **Pipeline** tab.
+2. The Pipeline tab shows a list of all pipeline runs, with status (Pass, Fail, In Progress), timestamp, and image digest.
+3. Click any pipeline run to view the full output for each stage, including scan reports and signing logs.
+
+<Callout type="tip">
+  Integrate the GW Harbor registry push into your own CI/CD pipeline (GitHub Actions, GitLab CI, Jenkins, etc.) to automatically trigger GW pipeline runs as part of your development workflow. Use the GW API key to authenticate your CI/CD runner to Harbor.
+</Callout>

@@ -1,0 +1,65 @@
+---
+title: "DoW Deployment"
+description: "Deploy your application on Game Warden's DoD-aligned infrastructure."
+roles: []
+---
+
+The Department of War (DoW) deployment path is Game Warden's offering for software vendors whose applications must operate on Department of Defense infrastructure. It provides a fully managed, ATO-ready environment that meets Impact Level 4 and Impact Level 5 requirements.
+
+## Who Is DoW Deployment For?
+
+DoW deployment is designed for:
+- Independent software vendors (ISVs) under contract with a DoD program office
+- Defense contractors delivering software to military branches or combatant commands
+- Vendors who have received or are pursuing a DoD ATO for their application
+- Teams targeting NIPRNET-connected environments
+
+If your contract references Platform One, Iron Bank, or a DoD Impact Level, you are almost certainly on the DoW path.
+
+## Key Concepts
+
+### Platform One
+
+Platform One (P1) is the DoD's enterprise DevSecOps platform. Game Warden's DoW environment is aligned with Platform One standards, meaning your application runs on infrastructure that satisfies P1 requirements for container hosting, pipeline security, and artifact management. You do not need a separate P1 account to deploy through Game Warden—GW manages the P1 integration on your behalf.
+
+### Authority to Operate (ATO)
+
+An ATO is the formal authorization granted by a DoD Authorizing Official (AO) that permits your system to operate in a DoD environment. ATOs are issued after a successful security review against the Risk Management Framework (RMF) control baseline. Game Warden helps vendors obtain their ATO by:
+- Providing a pre-authorized infrastructure baseline
+- Enabling vendors to inherit security controls from the GW system boundary
+- Guiding vendors through Body of Evidence (BoE) completion
+
+### Deployment Passport
+
+A Deployment Passport is a Game Warden artifact that certifies your application has passed all security requirements and is approved to deploy within GW-managed DoD environments. It is issued after your ATO is granted and is required before your application can go live in a DoW environment.
+
+### NIPRNET Access
+
+The Non-classified Internet Protocol Router Network (NIPRNET) is the DoD's network for handling sensitive but unclassified information. DoW deployments on Game Warden run within NIPRNET-connected infrastructure, which has specific requirements for network segmentation, access control, and data handling. Your application does not need to manage NIPRNET routing directly—GW handles network-level controls.
+
+## Onboarding Steps Overview
+
+<Steps>
+  <Step n={1} title="Create Your Account">
+    Register on the Game Warden portal and select DoW as your deployment path. You will need an organizational email and a sponsoring DoD program office contact.
+  </Step>
+  <Step n={2} title="Complete Entrance Criteria">
+    Your application must meet containerization, security, and operational requirements before you can proceed. See [Entrance Criteria](/getting-started/entrance-criteria) for the full checklist.
+  </Step>
+  <Step n={3} title="Submit Your Application">
+    Register your application in App Central, upload your container images to the GW Harbor registry, and initiate the pipeline scan.
+  </Step>
+  <Step n={4} title="Complete Body of Evidence">
+    Work through the BoE package in App Central, including your System Security Plan (SSP), Configuration Management Plan (CMP), and Incident Response Plan (IRP).
+  </Step>
+  <Step n={5} title="Security Review">
+    Second Front's security team reviews your BoE and pipeline results. Any findings must be remediated or accepted with documented justification.
+  </Step>
+  <Step n={6} title="ATO and Deployment Passport">
+    Once the security review passes, your ATO package is submitted to the Authorizing Official. Upon approval, you receive a Deployment Passport and your application is authorized to go live.
+  </Step>
+</Steps>
+
+<Callout type="tip">
+  DoW deployments at IL5 require additional compliance steps beyond IL4. If you are targeting IL5, review [IL5 Compliance Requirements](/getting-started/dow-il5) before beginning onboarding.
+</Callout>

@@ -1,0 +1,80 @@
+---
+title: "Supported Services"
+description: "Complete list of services supported on Game Warden."
+roles: []
+---
+
+This page provides a comprehensive reference of all services and capabilities available to applications deployed on Game Warden, organized by category.
+
+## Compute
+
+| Service | Description | Availability |
+|---|---|---|
+| Kubernetes Deployments | Stateless application workloads, horizontally scalable | All environments |
+| Kubernetes StatefulSets | Stateful workloads with stable network identity and persistent storage | All environments |
+| Kubernetes Jobs | One-time batch task execution | All environments |
+| Kubernetes CronJobs | Scheduled recurring task execution | All environments |
+| Horizontal Pod Autoscaler (HPA) | Automatic scaling based on CPU/memory or custom metrics | All environments |
+| Init Containers | Pre-start initialization logic | All environments |
+
+## Storage
+
+| Service | Description | Availability |
+|---|---|---|
+| Persistent Volume Claims (PVCs) | Block storage attached to pods; survives pod restarts | All environments |
+| SSD Storage Class (`gw-ssd`) | High-performance NVMe-backed block storage | All environments |
+| Standard Storage Class (`gw-standard`) | Cost-optimized block storage for non-latency-sensitive workloads | All environments |
+| Object Storage (S3-compatible) | Managed bucket storage via GW API; S3 SDK compatible | All environments |
+| ReadWriteMany (RWX) Volumes | Shared volumes accessible by multiple pods simultaneously | Available on request |
+
+## Networking
+
+| Service | Description | Availability |
+|---|---|---|
+| Kubernetes Services (ClusterIP) | Internal cluster DNS-based service discovery | All environments |
+| Kubernetes Services (LoadBalancer) | External load balancer with public or private IP | All environments |
+| NGINX Ingress | HTTP/HTTPS routing with TLS termination and WAF | All environments |
+| Istio Service Mesh | mTLS, traffic management, circuit breaking, canary deployments | All environments (required at IL4/IL5) |
+| Network Policies | Kubernetes-native L3/L4 traffic filtering per namespace | All environments |
+| Custom Domains | Bring-your-own-domain with automated TLS via cert-manager | All environments |
+
+## Data Services
+
+| Service | Description | Availability |
+|---|---|---|
+| Managed PostgreSQL | Fully managed relational database, versions 14/15 | All environments |
+| Managed Redis | Managed in-memory cache and message broker | All environments |
+| Managed Object Storage | Managed S3-compatible buckets with compliance logging | All environments |
+
+## Security
+
+| Service | Description | Availability |
+|---|---|---|
+| HashiCorp Vault | Secrets management, dynamic credentials, PKI | All environments |
+| cert-manager | Automatic TLS certificate lifecycle management | All environments |
+| OPA/Gatekeeper | Policy-as-code admission control | All environments |
+| Image Signing (Cosign) | Cryptographic provenance verification for container images | All environments |
+| Vulnerability Scanning (Trivy) | On-push CVE scanning for all registry images | All environments |
+| Prisma Cloud (Twistlock) | Enhanced runtime security scanning | DoW (IL4/IL5) |
+
+## Observability
+
+| Service | Description | Availability |
+|---|---|---|
+| Prometheus | Metrics collection and storage | All environments |
+| Grafana | Dashboards, metrics visualization, alerting | All environments |
+| Loki | Log aggregation and querying | All environments |
+| Promtail | Node-level log collection agent | All environments |
+| Jaeger | Distributed request tracing | Available on request |
+| Alertmanager | Alert routing and notification (PagerDuty, email, Slack) | All environments |
+
+## Not Supported
+
+The following services or capabilities are not available on Game Warden:
+
+- Windows containers
+- VM-based (non-container) workloads
+- Direct database access without managed service provisioning
+- Root or privileged pod execution
+- Custom cluster-level resources (CRDs) without Second Front approval
+- Direct kubectl cluster-admin access for tenants

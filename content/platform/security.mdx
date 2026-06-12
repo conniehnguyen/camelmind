@@ -1,0 +1,73 @@
+---
+title: "Security & Compliance"
+description: "Platform security posture and compliance overview."
+roles: []
+---
+
+Game Warden is designed from the ground up for highly regulated environments. This page provides an overview of the platform's compliance posture, the shared responsibility model, and key security controls that protect tenant applications and data.
+
+## Compliance Posture
+
+| Framework | Status | Scope |
+|---|---|---|
+| **FedRAMP Moderate** | Authorized | Commercial and FedRAMP path environments |
+| **DoD IL4** | Authorized (ATO) | DoW path environments |
+| **DoD IL5** | Authorized (ATO) | DoW path environments (dedicated IL5 infrastructure) |
+| **SOC2 Type II** | Annually audited | All environments |
+| **ISO 27001** | Certified | All environments |
+
+Compliance reports and authorization letters are available to customers under NDA. Contact your Second Front account representative to request copies.
+
+## Shared Responsibility Model
+
+Security on Game Warden is a shared responsibility between Second Front and tenant vendors.
+
+### Second Front is responsible for:
+
+- Physical security of data centers and hosting infrastructure
+- Kubernetes cluster management, patching, and hardening
+- Network segmentation and perimeter security
+- Platform-level vulnerability scanning and patching
+- Harbor registry security and image scanning pipeline
+- Secrets management infrastructure (Vault)
+- Logging and monitoring infrastructure
+- Platform-level compliance documentation and ATO maintenance
+- Incident response for platform-level security events
+
+### Vendors are responsible for:
+
+- Application-level security controls (authentication, authorization, input validation)
+- Application code security (remediating SAST findings, code reviews)
+- Container image patching (keeping dependencies and base images up to date)
+- Secrets hygiene (not hardcoding credentials, rotating application-level secrets)
+- Data classification and handling within the application
+- Completing and maintaining the BoE documentation
+- Remediating findings within SLA windows
+- Reporting security incidents involving their application
+
+## Key Security Controls
+
+### Network Security
+
+- All inter-namespace traffic is blocked by default (Kubernetes NetworkPolicy)
+- All intra-namespace traffic uses mTLS via Istio (required at IL4/IL5)
+- External ingress is filtered through a WAF before reaching application pods
+- Egress traffic from tenant namespaces is restricted to explicitly allowlisted destinations
+
+### Identity and Access
+
+- All human access to the GW portal requires MFA
+- Kubernetes RBAC limits tenant access to their own namespaces
+- Vault provides fine-grained secrets access based on service account identity
+- Audit logs record all privileged actions in the portal and cluster
+
+### Vulnerability Management
+
+- Container images are scanned on every push to Harbor (Trivy)
+- Continuous monitoring scans running workloads weekly for new CVEs (Prisma Cloud on DoW)
+- Critical CVEs trigger automated notifications within 1 hour of detection
+- Platform OS and Kubernetes patches are applied on a rolling schedule with no tenant downtime
+
+### Data Protection
+
+See [How Game Warden Protects Your Data](/platform/security-data-protection) for details on encryption, tenant isolation, and data residency.

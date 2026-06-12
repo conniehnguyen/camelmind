@@ -1,0 +1,86 @@
+---
+title: "Technical Requirements"
+description: "Technical requirements for onboarding to Game Warden."
+roles: []
+---
+
+These technical requirements define how your application must be built and configured to run on Game Warden's Kubernetes-based infrastructure. All requirements apply to every deployment path unless noted otherwise.
+
+## Container Image Requirements
+
+### Base Image
+
+Your container images must use an approved base image. For IL4/IL5 deployments, images must use Iron Bank-sourced base images. For FedRAMP and Commercial deployments, Red Hat UBI (Universal Base Image), Alpine, or Distroless base images are strongly recommended. See [Recommended Containers](/getting-started/ec-containers) for the full approved list.
+
+### No Root Processes
+
+Containers must not run as root (UID 0). Your Dockerfile or image configuration must specify a non-root user:
+
+```dockerfile
+USER 1001
+```
+
+Containers that require root to start will fail Game Warden's admission controller check and will not be deployed.
+
+### Health Checks
+
+All containers must define liveness and readiness probes. These probes are used by Kubernetes to determine when a container is healthy and ready to receive traffic.
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 30
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+```
+
+HTTP-based probes are preferred. TCP socket probes are acceptable. Exec-based probes are permitted but discouraged.
+
+## Resource Limits
+
+All containers must define CPU and memory resource requests and limits. Containers without resource limits will be rejected by the admission controller.
+
+Recommended starting values (adjust based on your application's observed usage):
+
+| Resource | Request | Limit |
+|---|---|---|
+| CPU | 100m | 500m |
+| Memory | 128Mi | 512Mi |
+
+Requests larger than 4 CPU or 8Gi memory per container require approval from the Second Front platform team.
+
+## Container Registry
+
+All container images must be pushed to the Game Warden Harbor registry before deployment. Images pulled directly from Docker Hub, GitHub Container Registry, or other public registries at runtime are not permitted. The Harbor registry is available at `registry.gamewarden.io`.
+
+## Logging Requirements
+
+Your application must write all logs to **stdout and stderr**. Log files written to the container filesystem will not be collected by the platform's log aggregation system.
+
+Logs must be structured (JSON preferred) and must not include sensitive data such as passwords, tokens, PII, or classified information.
+
+<Callout type="warning">
+  Logging sensitive data to stdout/stderr is a security finding that will block deployment. Audit your log output before submitting for review.
+</Callout>
+
+## Environment Variable Configuration
+
+Your application must be configurable via environment variables. Hardcoded configuration values (especially connection strings, credentials, or environment-specific URLs) are not permitted.
+
+- All secrets (API keys, database passwords, certificates) must be injected via Game Warden's secrets management system (Vault). Do not embed secrets in container images or Kubernetes manifests.
+- Environment-specific configuration (dev vs. staging vs. production) must be managed through separate environment variable sets, not separate image builds.
+
+## Supported Ports
+
+Containers must listen on ports above 1024. Privileged ports (below 1024) require root access and are not supported. Standard conventions:
+
+- HTTP: 8080
+- HTTPS: 8443
+- gRPC: 9090

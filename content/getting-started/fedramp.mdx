@@ -1,0 +1,59 @@
+---
+title: "FedRAMP Deployment"
+description: "Deploy on Game Warden's FedRAMP Moderate authorized infrastructure."
+roles: []
+---
+
+Game Warden's FedRAMP path allows software vendors to deploy on infrastructure that has received a FedRAMP Moderate Authority to Operate. By deploying through Game Warden, your application can inherit a significant portion of the FedRAMP Moderate control baseline, reducing the time and cost required to achieve your own authorization.
+
+## Game Warden's FedRAMP Authorization
+
+Game Warden holds a FedRAMP Moderate ATO. This authorization covers the platform infrastructure—compute, storage, networking, logging, and security tooling—that underpins all FedRAMP deployments. As a tenant on this platform, your application operates within the authorized boundary and can inherit the controls that GW has already implemented and documented.
+
+This does not mean your application is automatically FedRAMP authorized. You are responsible for the application-layer controls not covered by the platform. However, inheriting the platform controls dramatically reduces the number of controls your organization must independently implement and assess.
+
+## Who Is FedRAMP Deployment For?
+
+The FedRAMP path is appropriate for:
+- Vendors targeting federal civilian agencies (DHS, HHS, VA, Treasury, etc.)
+- Vendors whose customers require FedRAMP Moderate authorization as a condition of contract
+- Vendors handling unclassified federal data that does not require DoD impact levels
+- Vendors who are pursuing their own FedRAMP authorization and want a compliant hosting environment
+
+## Key Differences from DoW Deployment
+
+| Dimension | FedRAMP Path | DoW Path |
+|---|---|---|
+| Target customer | Federal civilian agencies | DoD program offices |
+| Data classification | Unclassified | CUI / CDI (IL4/IL5) |
+| Authorization framework | FedRAMP Moderate | DoD RMF / ATO |
+| Network | Commercial internet (with controls) | NIPRNET |
+| CAC/PIV required | Optional | Required at IL5 |
+| Deployment Passport | Not applicable | Required |
+
+## Getting Started
+
+<Steps>
+  <Step n={1} title="Create Your Account">
+    Register at the Game Warden portal and select FedRAMP as your deployment path. See [Create Your Account](/getting-started/create-account) for step-by-step instructions.
+  </Step>
+  <Step n={2} title="Set Up Your FedRAMP Workspace">
+    Complete organization setup and link your account to a FedRAMP workspace. See [FedRAMP Account Setup](/getting-started/fedramp-account-setup).
+  </Step>
+  <Step n={3} title="Review Entrance Criteria">
+    Ensure your application meets all technical and security entrance criteria. See [Entrance Criteria](/getting-started/entrance-criteria).
+  </Step>
+  <Step n={4} title="Submit Your Application">
+    Register your application in App Central, upload container images, and initiate the pipeline scan.
+  </Step>
+  <Step n={5} title="Complete Compliance Documentation">
+    Work through the FedRAMP-specific compliance checklist in App Central, including your Customer Responsibility Matrix (CRM) and system description.
+  </Step>
+  <Step n={6} title="Security Review and Deployment">
+    Second Front reviews your submission. Upon approval, your application is deployed to the FedRAMP environment.
+  </Step>
+</Steps>
+
+<Callout type="note">
+  If your application will eventually need DoD IL4 or IL5 authorization, consider starting with the DoW path directly. Migrating between paths after deployment requires re-onboarding.
+</Callout>

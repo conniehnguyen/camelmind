@@ -1,0 +1,78 @@
+---
+title: "CVEs & Compliance"
+description: "How to address CVEs and maintain compliance on Game Warden."
+roles: []
+---
+
+CVE (Common Vulnerabilities and Exposures) management is one of the most time-sensitive ongoing compliance obligations for Game Warden tenants. This page explains how CVEs are detected, the remediation SLAs you must meet, and how to handle cases where immediate patching is not possible.
+
+## How CVEs Are Detected
+
+Game Warden uses a multi-layer scanning approach to detect CVEs in your application:
+
+### On-Push Scanning (Trivy via Harbor)
+
+Every time you push a container image to the Game Warden Harbor registry, Trivy immediately scans the image for known CVEs in:
+- OS packages (RPM, APT, Alpine apk)
+- Language-specific package managers (npm, pip, Maven, Gradle, Go modules)
+- Application binaries (where detectable)
+
+Results are available in Harbor and in App Central within minutes of the push.
+
+### Continuous Monitoring (Prisma Cloud / Twistlock)
+
+For DoW (IL4/IL5) environments, Prisma Cloud continuously monitors running workloads for newly disclosed CVEs. When the NVD or vendor advisory databases are updated with a new CVE, Prisma Cloud re-evaluates all running images against the new data. New findings are created in App Central automatically and trigger email notifications.
+
+This means you can receive new findings even if you have not made any changes to your application—simply because a new CVE was disclosed in a library you depend on.
+
+## Remediation SLAs
+
+You are required to remediate or formally document exceptions for CVE findings within the following timeframes:
+
+| Severity | Remediation SLA | Notes |
+|---|---|---|
+| **Critical** | 3 days | Automatic Deployment Passport suspension if unaddressed after 3 days |
+| **High** | 7 days | Escalation to Second Front account team after 7 days |
+| **Medium** | 30 days | Must be in POA&M if not remediated within 30 days |
+| **Low** | 90 days | Must be in POA&M if not remediated within 90 days |
+
+SLA timers begin when the finding is first detected, not when it is acknowledged in App Central.
+
+## Remediation Options
+
+### Patch (Recommended)
+
+Update the affected package or dependency to a version that resolves the CVE, rebuild your container image, and push the updated image to the Harbor registry. The pipeline will re-scan the new image. If the CVE is resolved, the finding will automatically transition to Resolved.
+
+For OS package CVEs, update your base image to the latest version from your image source (Iron Bank, UBI, etc.). Base image maintainers typically release patched versions within days of a CVE disclosure.
+
+### Accept Risk with Justification
+
+If a CVE cannot be immediately remediated—for example, because a patched version of the dependency does not yet exist, or because updating would break application functionality—you can accept the risk:
+
+1. In App Central, open the finding and click **Accept Risk**.
+2. Provide a written justification that includes:
+   - Why the CVE is not immediately patchable
+   - Why the risk is acceptable in your specific deployment context (e.g., the vulnerable component is not reachable by external users)
+   - Your planned remediation timeline
+3. The Second Front security team reviews accepted risks. Critical and High findings require explicit reviewer approval.
+4. Set a target remediation date. This date becomes your POA&M deadline.
+
+### False Positive
+
+If the CVE does not actually apply to your application (e.g., the vulnerable function is present in a library but not called by your code), you can mark it as a false positive with documented evidence. See [Findings](/gw-app/findings) for the false positive process.
+
+## Documenting Accepted Risks in the BoE
+
+All accepted risks must be reflected in your POA&M, which is a subsection of your BoE. In App Central:
+
+1. Navigate to your application's **BoE** tab.
+2. Open the **Plan of Action and Milestones (POA&M)** section.
+3. Accepted risks are automatically added to the POA&M when you accept a finding. Review the auto-generated entry and add any additional context.
+4. Update POA&M entries monthly with current status.
+
+Accepted risks that miss their target remediation date will escalate to High severity regardless of original severity, and may trigger a Deployment Passport review.
+
+<Callout type="tip">
+  Set up Grafana alerting for new Critical and High findings so you are notified immediately when new CVEs are detected, rather than waiting for the daily email digest. This maximizes the time available for remediation within the SLA window.
+</Callout>

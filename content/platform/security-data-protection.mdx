@@ -1,0 +1,72 @@
+---
+title: "How Game Warden Protects Your Data"
+description: "Data protection mechanisms in Game Warden."
+roles: []
+---
+
+Game Warden implements multiple layers of data protection across the platform. This page covers encryption, tenant isolation, secrets management, data residency, and backup and recovery policies.
+
+## Encryption at Rest
+
+All data at rest on Game Warden is encrypted:
+
+- **Persistent Volumes (PVCs)**: Encrypted using AES-256 with AWS KMS-managed keys (EBS encryption for Commercial/FedRAMP; GovCloud KMS for DoW).
+- **Object Storage**: S3 bucket server-side encryption (SSE-S3 with AES-256, or SSE-KMS for DoW environments).
+- **Managed Databases (PostgreSQL)**: Storage encryption enabled by default using AES-256.
+- **Managed Redis**: Encryption at rest enabled on all instances.
+- **Vault Secrets**: Secrets are encrypted at rest using Vault's AES-256-GCM encryption before being written to storage.
+
+For IL5 deployments, encryption uses FIPS 140-2 validated modules. See [IL5 Compliance Requirements](/getting-started/dow-il5) for details.
+
+## Encryption in Transit
+
+All data in transit is encrypted using TLS 1.2 or higher:
+
+- **External traffic**: TLS terminated at the NGINX ingress controller. Certificates are automatically managed by cert-manager.
+- **Intra-cluster traffic**: Istio service mesh enforces mTLS between all pods in IL4/IL5 namespaces. mTLS is opt-in for Commercial and FedRAMP namespaces.
+- **Platform components**: All communication between GW control plane components (ArgoCD, Vault, Harbor, Prometheus) uses TLS.
+- **Managed database connections**: All PostgreSQL connections require SSL. Clients connecting without SSL are rejected.
+
+## Tenant Isolation
+
+Game Warden provides strong isolation between tenants:
+
+- **Namespace isolation**: Each tenant is deployed in dedicated Kubernetes namespaces with RBAC preventing cross-namespace access.
+- **Network isolation**: Default-deny NetworkPolicies prevent any pod from communicating with pods in other tenant namespaces.
+- **Storage isolation**: PVCs are provisioned per namespace. Tenants cannot access each other's persistent volumes.
+- **Secrets isolation**: Vault policies restrict each service account to only the secret paths belonging to its namespace.
+- **Compute isolation**: Resource quotas and LimitRanges prevent a single tenant from monopolizing cluster resources (noisy neighbor protection).
+
+## Secrets Management
+
+<Callout type="important">
+  You are responsible for application-level encryption and secrets handling within your application code. Game Warden protects secrets in the platform layer, but if your application logs secrets or passes them insecurely between components, that is a vendor responsibility.
+</Callout>
+
+Vault handles all secrets on the GW platform:
+
+- Secrets are never stored in Kubernetes Secret objects (which are base64-encoded, not encrypted, by default)
+- Secrets are injected into pods at runtime via the Vault Agent sidecar
+- Dynamic credentials (database passwords) are short-lived and automatically rotated
+- Secret access is logged in Vault audit logs for compliance purposes
+
+## Data Residency
+
+| Environment | Data Location |
+|---|---|
+| Commercial | AWS us-east-1 (Virginia) or us-west-2 (Oregon) |
+| FedRAMP | AWS us-east-1 (Virginia) |
+| DoW (IL4/IL5) | AWS GovCloud us-gov-east-1 or us-gov-west-1 |
+
+All data remains within the United States. Game Warden does not replicate tenant data to regions outside the US. Cross-region replication for disaster recovery uses US-only regions.
+
+## Backup and Recovery
+
+| Service | Backup Frequency | Retention | RTO | RPO |
+|---|---|---|---|---|
+| Managed PostgreSQL | Daily full + continuous WAL archiving | 30 days | 4 hours | 5 minutes |
+| Managed Redis | Daily RDB snapshot (if persistence enabled) | 7 days | 2 hours | 24 hours |
+| Object Storage | Cross-region replication (US regions only) | Object lifecycle rules apply | 1 hour | Near real-time |
+| Persistent Volumes | Daily snapshots | 14 days | 4 hours | 24 hours |
+
+Point-in-time recovery for PostgreSQL is available within the retention window. To request a restore, submit a P1 support ticket.

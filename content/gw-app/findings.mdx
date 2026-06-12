@@ -1,0 +1,72 @@
+---
+title: "Findings"
+description: "Understanding and resolving security findings in Game Warden."
+roles: []
+---
+
+Security findings are issues identified by Game Warden's automated pipeline scans or by the Second Front security review team. Managing findings promptly is essential for maintaining your authorization status and keeping your application compliant.
+
+## What Are Findings?
+
+Findings are security issues that must be addressed (or formally accepted) before your application can be deployed or continue operating in a GW environment. Findings come from three sources:
+
+- **SAST (Static Application Security Testing)**: Code-level vulnerabilities detected by scanning your application source or configuration files
+- **DAST (Dynamic Application Security Testing)**: Runtime vulnerabilities found by testing a running instance of your application
+- **CVE (Common Vulnerabilities and Exposures)**: Known vulnerabilities in your container images' OS packages or application dependencies, detected by the Twistlock/Prisma Cloud vulnerability scanner
+
+## Severity Levels
+
+| Severity | Definition | Remediation SLA |
+|---|---|---|
+| **Critical** | Vulnerabilities that can be directly exploited to compromise the system, with no mitigating controls | 3 days |
+| **High** | Significant vulnerabilities that are likely exploitable in typical configurations | 7 days |
+| **Medium** | Vulnerabilities that require specific conditions to exploit or have limited impact | 30 days |
+| **Low** | Vulnerabilities with minimal direct impact or theoretical risk only | 90 days |
+
+SLA timers begin at the time the finding is first detected, not when it is acknowledged.
+
+## Viewing Findings in App Central
+
+1. In App Central, open your application and click the **Findings** tab.
+2. Use the filter controls to narrow by severity, source (SAST/DAST/CVE), or status.
+3. Click any finding to view the full detail: description, affected component, CVE identifier (if applicable), evidence, and remediation guidance.
+
+## Remediating Findings
+
+Each finding must be addressed in one of three ways:
+
+### Fix (Recommended)
+
+Patch the vulnerability, update the affected dependency, or remediate the code-level issue. Once fixed:
+1. Rebuild and push your updated container image to the GW Harbor registry.
+2. Trigger a new pipeline scan from the **Pipeline** tab.
+3. If the fix is successful, the finding will automatically transition to **Resolved** in the next scan cycle.
+
+### Accept Risk
+
+In some cases, a vulnerability may not be practically exploitable in your specific deployment context, or a fix may not be available yet. You can accept a finding's risk with a documented justification:
+
+1. Open the finding and click **Accept Risk**.
+2. Provide a written justification explaining why the risk is acceptable given your deployment context.
+3. Set a re-review date (required; must be within the maximum POA&M duration for the severity level).
+4. The Second Front security team reviews accepted risks. Critical and High accepted risks require explicit approval from the reviewer.
+
+### Mark as False Positive
+
+If a finding does not apply to your application (e.g., a CVE in a library component that your application does not use), you can mark it as a false positive:
+
+1. Open the finding and click **False Positive**.
+2. Provide evidence that the finding does not apply (e.g., the vulnerable code path is not reachable, the package is present but not loaded).
+3. The Second Front team reviews false positive claims. Incorrectly marked false positives will be re-opened.
+
+## Finding Status Lifecycle
+
+```
+Open → In Remediation → Resolved (via fix)
+Open → Accepted Risk (via risk acceptance, requires review)
+Open → False Positive (via FP claim, requires review)
+```
+
+<Callout type="warning">
+  Unaddressed Critical or High findings beyond their SLA may result in suspension of your Deployment Passport or deployment access. If you cannot remediate within the SLA, submit an accepted risk with justification before the deadline.
+</Callout>
