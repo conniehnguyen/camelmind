@@ -98,24 +98,24 @@ nav:
       - label: "Game Warden App"
         slug: /getting-started/gw-app
         file: content/getting-started/gw-app.mdx
-        roles: []
+        roles: [vendor]
         section:
           - label: "App Central"
             slug: /getting-started/gw-app/app-central
             file: content/gw-app/app-central.mdx
-            roles: []
+            roles: [vendor]
           - label: "Body of Evidence"
             slug: /getting-started/gw-app/boe
             file: content/gw-app/boe.mdx
-            roles: []
+            roles: [vendor]
           - label: "Findings"
             slug: /getting-started/gw-app/findings
             file: content/gw-app/findings.mdx
-            roles: []
+            roles: [vendor]
           - label: "Support Tickets"
             slug: /getting-started/gw-app/support-tickets
             file: content/gw-app/support-tickets.mdx
-            roles: []
+            roles: [vendor]
 
   - label: "Platform & Security"
     dropdown: true
@@ -175,11 +175,11 @@ nav:
       - label: "Amazon Bedrock"
         slug: /integrations/amazon-bedrock
         file: content/integrations/amazon-bedrock.mdx
-        roles: []
+        roles: [admin]
       - label: "Cohere"
         slug: /integrations/cohere
         file: content/integrations/cohere.mdx
-        roles: []
+        roles: [admin]
 
   - label: "Release Notes"
     slug: /release-notes

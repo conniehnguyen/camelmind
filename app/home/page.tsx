@@ -1,7 +1,7 @@
 import Link from "next/link"
-import { loadNav, getGroupForSlug } from "@/lib/nav"
+import { loadNav } from "@/lib/nav"
 import { loadVersions } from "@/lib/versions"
-import { getMockSession } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { TopNav } from "@/components/Nav/TopNav"
 import type { NavGroup } from "@/lib/nav-types"
 
@@ -60,16 +60,17 @@ const COMMUNITY = [
   { icon: "📄", title: "Release Notes", description: "Stay current with the latest platform updates, new features, and breaking changes.", href: "/release-notes" },
 ]
 
-export default function HomePage() {
+export default async function HomePage() {
   const nav = loadNav()
   const { versions } = loadVersions()
-  const session = getMockSession()
+  const session = await getSession()
 
   return (
     <div className="flex flex-col min-h-screen">
       <TopNav
         nav={nav.nav}
         userRoles={session?.roles ?? []}
+        userName={session?.name ?? null}
         versions={versions}
         currentVersionId={null}
         currentSlug="/home"

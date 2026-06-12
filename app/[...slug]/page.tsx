@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { MDXRemote } from "next-mdx-remote/rsc"
 import remarkGfm from "remark-gfm"
 import rehypeSlug from "rehype-slug"
@@ -11,7 +11,7 @@ import {
   getSectionForSlugFromConfig,
 } from "@/lib/nav"
 import { loadMdxFile } from "@/lib/mdx"
-import { getMockSession, hasAccess } from "@/lib/auth"
+import { getSession, hasAccess } from "@/lib/auth"
 import { loadVersions, getVersionFromSlug, getNavForVersion } from "@/lib/versions"
 import { TopNav } from "@/components/Nav/TopNav"
 import { Sidebar } from "@/components/Sidebar/Sidebar"
@@ -56,18 +56,23 @@ export default async function DocPage({ params }: Props) {
   const navEntry = getEntryBySlugFromConfig(nav, fullSlug)
   if (!navEntry) return notFound()
 
-  const session = getMockSession()
+  const session = await getSession()
 
   if (!hasAccess(navEntry.roles, session?.roles ?? [])) {
+    // Not logged in at all → send to login page with return URL
+    if (!session) {
+      redirect(`/login?returnTo=${encodeURIComponent(fullSlug)}`)
+    }
+    // Logged in but wrong role → show access denied
     return (
       <div className="flex flex-col h-screen">
-        <TopNav nav={nav.nav} userRoles={session?.roles ?? []} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} />
+        <TopNav nav={nav.nav} userRoles={session.roles} userName={session.name} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} />
         <div className="flex flex-1 items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Restricted</h1>
             <p className="text-gray-500">You don&apos;t have permission to view this page.</p>
             <p className="text-xs text-gray-400 mt-2">
-              Required roles: {navEntry.roles.join(", ")} · Your roles: {session?.roles.join(", ") ?? "none"}
+              Required roles: {navEntry.roles.join(", ")} · Your roles: {session.roles.join(", ")}
             </p>
           </div>
         </div>
@@ -82,7 +87,7 @@ export default async function DocPage({ params }: Props) {
 
   return (
     <div className="flex flex-col h-screen">
-      <TopNav nav={nav.nav} userRoles={session?.roles ?? []} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} />
+      <TopNav nav={nav.nav} userRoles={session?.roles ?? []} userName={session?.name ?? null} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar activeGroup={activeGroup} currentSlug={fullSlug} userRoles={session?.roles ?? []} />
         <main className="flex-1 overflow-y-auto">

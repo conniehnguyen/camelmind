@@ -10,13 +10,19 @@ import type { Version } from "@/lib/versions"
 type Props = {
   nav: (NavEntry | NavGroup)[]
   userRoles: string[]
+  userName?: string | null
   versions: Version[]
   currentVersionId: string | null
   currentSlug: string
 }
 
-export function TopNav({ nav, userRoles, versions, currentVersionId, currentSlug }: Props) {
+export function TopNav({ nav, userRoles, userName, versions, currentVersionId, currentSlug }: Props) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+
+  async function signOut() {
+    await fetch("/api/auth/logout", { method: "POST" })
+    window.location.href = "/login"
+  }
 
   const canSee = (roles: string[]) =>
     roles.length === 0 || roles.some((r) => userRoles.includes(r))
@@ -76,6 +82,24 @@ export function TopNav({ nav, userRoles, versions, currentVersionId, currentSlug
           currentVersionId={currentVersionId}
           currentSlug={currentSlug}
         />
+        {userName ? (
+          <div className="flex items-center gap-2 border-l border-gray-700 pl-4">
+            <span className="text-xs text-gray-400">{userName}</span>
+            <button
+              onClick={signOut}
+              className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-2 py-1 rounded transition-colors"
+            >
+              Sign out
+            </button>
+          </div>
+        ) : (
+          <a
+            href="/login"
+            className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-2 py-1 rounded transition-colors ml-2"
+          >
+            Sign in
+          </a>
+        )}
       </div>
     </nav>
   )

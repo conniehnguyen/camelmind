@@ -1,26 +1,43 @@
-// Mock auth for POC — replace with next-auth + Keycloak for production
+import { SignJWT, jwtVerify } from "jose"
+import { cookies } from "next/headers"
 
-export type MockUser = {
+export type SessionUser = {
   name: string
   email: string
   roles: string[]
 }
 
-// Swap this to test different roles: [], ['vendor'], ['admin'], ['vendor', 'admin']
-export const MOCK_USER: MockUser = {
-  name: "Test Vendor",
-  email: "vendor@example.com",
-  roles: ["vendor"],
+const COOKIE_NAME = "gw_session"
+const SECRET = new TextEncoder().encode(
+  process.env.SESSION_SECRET ?? "fallback-dev-secret-change-in-prod"
+)
+
+export async function createSession(user: SessionUser): Promise<string> {
+  return new SignJWT({ ...user })
+    .setProtectedHeader({ alg: "HS256" })
+    .setExpirationTime("8h")
+    .sign(SECRET)
 }
 
-// Set to null to simulate unauthenticated user
-// export const MOCK_USER: MockUser | null = null
-
-export function getMockSession(): MockUser | null {
-  return MOCK_USER
+export async function getSession(): Promise<SessionUser | null> {
+  const cookieStore = await cookies()
+  const token = cookieStore.get(COOKIE_NAME)?.value
+  if (!token) return null
+  try {
+    const { payload } = await jwtVerify(token, SECRET)
+    return {
+      name: payload.name as string,
+      email: payload.email as string,
+      roles: payload.roles as string[],
+    }
+  } catch {
+    return null
+  }
 }
 
 export function hasAccess(requiredRoles: string[], userRoles: string[]): boolean {
   if (requiredRoles.length === 0) return true
   return requiredRoles.some((r) => userRoles.includes(r))
 }
+
+export { COOKIE_NAME }
