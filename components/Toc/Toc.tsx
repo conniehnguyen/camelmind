@@ -37,11 +37,12 @@ export function Toc({ entries }: { entries: TocEntry[] }) {
           <li key={entry.id}>
             <a
               href={`#${entry.id}`}
-              className={`block text-sm leading-snug py-1 pl-3 transition-colors border-l-2 -ml-px ${
+              style={activeId === entry.id ? { borderColor: "var(--sf-green)", color: "var(--sf-green-dim)" } : {}}
+              className={`block text-sm leading-snug py-1 transition-colors border-l-2 -ml-px ${
                 entry.level === 3 ? "pl-5" : "pl-3"
               } ${
                 activeId === entry.id
-                  ? "border-blue-500 text-blue-600 font-semibold"
+                  ? "font-semibold"
                   : "border-transparent text-gray-400 hover:text-gray-700"
               }`}
             >

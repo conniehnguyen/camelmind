@@ -62,3 +62,73 @@ If you are unsure which path applies to your program, start by answering these q
 <Callout type="important">
   Switching paths after onboarding requires re-evaluation of your entrance criteria and may reset your BoE progress. Select the correct path before beginning onboarding.
 </Callout>
+
+## Onboarding Steps
+
+Follow these steps after selecting your authorization path.
+
+<Steps>
+  <Step step="1" title="Select your path">
+    Review the deployment paths above and confirm which environment your contract requires. If unsure, answer the four questions in the **How to Choose** section, or contact your Second Front account representative.
+
+    <Callout type="tip">
+      If you're in early-stage contracting with no IL requirement yet, start with Commercial — you can migrate to DoW or FedRAMP later without losing your application profile.
+    </Callout>
+  </Step>
+
+  <Step step="2" title="Review entrance criteria">
+    Each path has a set of technical and security requirements your application must satisfy before onboarding. Review the full list for your chosen path:
+
+    - [DoW Entrance Criteria](/getting-started/entrance-criteria/general)
+    - [FedRAMP Entrance Criteria](/getting-started/entrance-criteria/general)
+    - [Commercial Entrance Criteria](/getting-started/entrance-criteria/general)
+
+    Common requirements across all paths include containerized workloads, a passing SAST/DAST scan, and a completed software bill of materials (SBOM).
+  </Step>
+
+  <Step step="3" title="Create your account">
+    Sign up for a Game Warden vendor account at [app.gamewarden.io](https://app.gamewarden.io). During registration you will:
+
+    1. Select your organization type (Vendor / ISV)
+    2. Choose your target authorization path
+    3. Invite your technical and compliance team members
+
+    <Callout type="important">
+      Your account is tied to your authorization path. If you need to change paths after account creation, contact support — do not create a second account.
+    </Callout>
+  </Step>
+
+  <Step step="4" title="Submit your application in App Central">
+    Once your account is active, open **App Central** and create a new application submission. You will need:
+
+    | Field | Description |
+    |---|---|
+    | Application name | The name as it will appear in the ATO package |
+    | Deployment path | DoW / FedRAMP / Commercial — must match your account |
+    | Target IL | IL4 or IL5 (DoW only) |
+    | Container registry | URL of your container image repository |
+    | SBOM file | CycloneDX or SPDX format |
+
+  </Step>
+
+  <Step step="5" title="Complete your Body of Evidence">
+    The Body of Evidence (BoE) is a structured package of security artifacts that demonstrates your application meets the controls required for your authorization path. It includes sections for:
+
+    - System Security Plan (SSP) narrative
+    - Scan results (SAST, DAST, container image)
+    - Configuration compliance evidence
+    - Incident response plan
+
+    Game Warden's automated pipeline handles many of these scans for you. Manual evidence uploads are required for policy and process artifacts.
+
+    <Callout type="warning">
+      BoE sections have a defined order of completion. Do not skip sections — incomplete BoEs cannot be submitted for review.
+    </Callout>
+  </Step>
+
+  <Step step="6" title="Respond to findings">
+    After your BoE is submitted, the Second Front security team reviews your artifacts and raises **Findings** — items that require remediation or a documented risk acceptance before authorization can proceed.
+
+    Findings are prioritized by severity: Critical and High must be remediated; Medium and Low may be accepted with justification. Track and respond to all open findings in App Central before requesting final authorization.
+  </Step>
+</Steps>

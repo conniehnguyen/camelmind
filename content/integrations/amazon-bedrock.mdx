@@ -22,10 +22,19 @@ Before integrating Bedrock with your GW-deployed application:
 ## Step-by-Step Setup
 
 <Steps>
-  <Step n={1} title="Request Egress Allowlisting">
+  <Step step="1" title="Define your use case">
+    Before integrating Amazon Bedrock on Game Warden, determine how your application will use the service:
+
+    - **Text generation** — chat, summarization, document drafting (Claude, Llama, Mistral)
+    - **Embeddings** — semantic search, RAG pipelines (Titan Embeddings, Cohere Embed)
+    - **Reranking** — improve retrieval relevance in RAG (Cohere Rerank)
+
+    Your use case determines which foundation models you need access to and whether you require streaming responses (`InvokeModelWithResponseStream`).
+  </Step>
+  <Step step="2" title="Request Egress Allowlisting">
     Submit a support ticket in App Central requesting an egress allowlist rule for the Bedrock API endpoint: `bedrock-runtime.us-east-1.amazonaws.com` (or your target region). Include your namespace name and the CIDR range of the Bedrock endpoint. Second Front will update your NetworkPolicy within 1 business day.
   </Step>
-  <Step n={2} title="Create IAM Credentials for Your Application">
+  <Step step="3" title="Create IAM Credentials for Your Application">
     In your AWS account, create an IAM user or role for your GW application. Generate an access key ID and secret access key (for IAM user) or configure IAM role assumption. Scope the permissions to the specific Bedrock actions and models your application uses:
 
     ```json
@@ -41,12 +50,12 @@ Before integrating Bedrock with your GW-deployed application:
     }
     ```
   </Step>
-  <Step n={3} title="Store Credentials in Vault">
+  <Step step="4" title="Store Credentials in Vault">
     Store your AWS credentials in Game Warden's Vault secrets manager. Do not hardcode credentials in your application or Kubernetes manifests.
 
     Submit a support ticket requesting a Vault secret path provisioned for your namespace (e.g., `secret/your-app/aws-bedrock`). Once provisioned, write your credentials to Vault and configure your application to read them via the Vault Agent sidecar environment variable injection.
   </Step>
-  <Step n={4} title="Configure Your Application">
+  <Step step="5" title="Configure Your Application">
     Use the AWS SDK for your language (Python `boto3`, Node.js `@aws-sdk/client-bedrock-runtime`, Java `software.amazon.awssdk:bedrockruntime`) and configure it to read credentials from environment variables injected by Vault:
 
     ```python
@@ -60,7 +69,7 @@ Before integrating Bedrock with your GW-deployed application:
     )
     ```
   </Step>
-  <Step n={5} title="Test Connectivity">
+  <Step step="6" title="Test Connectivity">
     Deploy a test pod in your GW namespace and verify that you can successfully call the Bedrock API. If connectivity fails, check your egress NetworkPolicy and confirm the allowlist rule was applied.
   </Step>
 </Steps>

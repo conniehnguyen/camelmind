@@ -1,19 +1,33 @@
 export function Steps({ children }: { children: React.ReactNode }) {
   return (
-    <ol className="relative border-l border-gray-200 ml-3 space-y-6 my-6">
-      {children}
-    </ol>
+    <div className="timeline">
+      <div className="timeline-content">
+        {children}
+      </div>
+    </div>
   )
 }
 
-export function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+function slugify(title: string) {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+}
+
+export function Step({ step, title, children }: { step: string | number; title: string; children: React.ReactNode }) {
+  const id = slugify(title)
   return (
-    <li className="ml-6">
-      <span className="absolute -left-3.5 flex items-center justify-center w-7 h-7 bg-blue-600 text-white rounded-full text-xs font-bold">
-        {n}
-      </span>
-      <h3 className="font-semibold mb-1">{title}</h3>
-      <div className="text-sm text-gray-700">{children}</div>
-    </li>
+    <div className="timeline-item" id={id} data-step={step} style={{ scrollMarginTop: "5rem" }}>
+      <a
+        href={`#${id}`}
+        className="timeline-step-anchor"
+        aria-label={`Link to step ${step}: ${title}`}
+      >
+        {step}
+      </a>
+      <h3>{title}</h3>
+      <div>{children}</div>
+    </div>
   )
 }

@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* ── Second Front brand tokens ── */
+:root {
+  --sf-green: #47FF51;
+  --sf-green-dim: #2bcc34;   /* slightly darker for text on white — better contrast */
+}
+
 /* ── Callout / Admonition styles from Second Front brand ── */
 
 .callout {
@@ -130,7 +136,7 @@ body {
   max-width: 100%;
 }
 
-/* Numbered circle */
+/* Numbered circle — used by raw HTML divs in MDX */
 .timeline-item::before {
   content: attr(data-step);
   position: absolute;
@@ -147,6 +153,35 @@ body {
   font-weight: bold;
   font-size: 16px;
   z-index: 1;
+}
+
+/* When a real <a> renders the circle (Step component), suppress ::before */
+.timeline-item:has(.timeline-step-anchor)::before {
+  display: none;
+}
+
+/* Anchor link that IS the circle — same geometry as ::before */
+.timeline-step-anchor {
+  position: absolute;
+  left: -2rem;
+  top: 0;
+  background-color: #636363;
+  color: white;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 16px;
+  z-index: 1;
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+.timeline-step-anchor:hover {
+  background-color: #444;
 }
 
 /* Dotted vertical line */
