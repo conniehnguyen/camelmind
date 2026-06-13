@@ -49,25 +49,25 @@ IL5 builds on the IL4 baseline and adds controls in four key areas:
 ## Steps to Achieve IL5 Compliance on Game Warden
 
 <Steps>
-  <Step n={1} title="Confirm IL5 Designation">
+  <Step step="1" title="Confirm IL5 Designation">
     Obtain written confirmation from your DoD program office that IL5 is required. This is typically documented in your contract or Memorandum of Agreement (MOA).
   </Step>
-  <Step n={2} title="Notify Your Second Front Representative">
+  <Step step="2" title="Notify Your Second Front Representative">
     Contact your Second Front account team to request IL5 onboarding. IL5 environments are provisioned separately and require additional coordination.
   </Step>
-  <Step n={3} title="Configure CAC/PIV Authentication">
+  <Step step="3" title="Configure CAC/PIV Authentication">
     Work with the GW team to integrate your application with the IL5 identity provider, which enforces CAC/PIV at login. Game Warden provides a pre-configured OIDC integration for this purpose.
   </Step>
-  <Step n={4} title="Validate Encryption Configuration">
+  <Step step="4" title="Validate Encryption Configuration">
     Ensure your application uses FIPS-validated cryptographic libraries. Game Warden will run an encryption posture check as part of the IL5 security review.
   </Step>
-  <Step n={5} title="Source Images from Iron Bank">
+  <Step step="5" title="Source Images from Iron Bank">
     Update your container build pipeline to use Iron Bank base images. Submit your SBOM as part of your BoE package.
   </Step>
-  <Step n={6} title="Complete IL5-Specific BoE Sections">
+  <Step step="6" title="Complete IL5-Specific BoE Sections">
     The IL5 BoE includes additional control documentation sections beyond the standard IL4 BoE. Your Second Front representative will provide the IL5-specific BoE template.
   </Step>
-  <Step n={7} title="Undergo IL5 Security Review">
+  <Step step="7" title="Undergo IL5 Security Review">
     The IL5 security review includes additional testing: penetration testing, cryptographic validation, and network isolation verification. Plan for an additional 2–4 weeks compared to the IL4 review timeline.
   </Step>
 </Steps>

@@ -41,17 +41,17 @@ Before integrating Cohere with your GW-deployed application:
 Never hardcode your Cohere API key in application code, environment variable manifests, or container images. Use Game Warden's Vault secrets manager:
 
 <Steps>
-  <Step n={1} title="Request a Vault Secret Path">
+  <Step step="1" title="Request a Vault Secret Path">
     Submit a support ticket requesting a Vault secret path for your namespace (e.g., `secret/your-app/cohere`).
   </Step>
-  <Step n={2} title="Store Your API Key in Vault">
+  <Step step="2" title="Store Your API Key in Vault">
     Once the path is provisioned, store your Cohere API key:
     ```bash
     vault kv put secret/your-app/cohere api_key="your-cohere-api-key"
     ```
     Second Front will provide Vault CLI access or an alternative method for initial secret population.
   </Step>
-  <Step n={3} title="Configure Vault Agent Injection">
+  <Step step="3" title="Configure Vault Agent Injection">
     Add Vault Agent annotations to your Kubernetes deployment to inject the API key as an environment variable at pod startup:
     ```yaml
     annotations:
@@ -63,7 +63,7 @@ Never hardcode your Cohere API key in application code, environment variable man
         {{- end }}
     ```
   </Step>
-  <Step n={4} title="Access the Key in Your Application">
+  <Step step="4" title="Access the Key in Your Application">
     Your application reads the API key from the environment variable:
     ```python
     import cohere

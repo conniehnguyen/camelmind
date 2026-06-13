@@ -29,22 +29,22 @@ The Deployment Passport includes:
 ## The Authorization Process
 
 <Steps>
-  <Step n={1} title="Complete Body of Evidence">
+  <Step step="1" title="Complete Body of Evidence">
     Work through all required BoE sections in App Central: System Security Plan (SSP), Configuration Management Plan (CMP), Incident Response Plan (IRP), and Continuous Monitoring Plan (ConMon). All sections must be marked complete before security review begins.
   </Step>
-  <Step n={2} title="Pass Pipeline Security Scans">
+  <Step step="2" title="Pass Pipeline Security Scans">
     Your container images must pass Game Warden's automated security pipeline, including vulnerability scanning, SAST analysis, and image signing. Critical findings must be remediated; High findings require documented justification to proceed.
   </Step>
-  <Step n={3} title="Security Review by Second Front">
+  <Step step="3" title="Security Review by Second Front">
     Second Front's security team conducts a manual review of your BoE and pipeline results. This typically takes 2–4 weeks.
   </Step>
-  <Step n={4} title="ATO Package Submission">
+  <Step step="4" title="ATO Package Submission">
     Second Front compiles your security package and submits it to the Authorizing Official. The AO review typically takes 2–6 weeks.
   </Step>
-  <Step n={5} title="ATO Decision">
+  <Step step="5" title="ATO Decision">
     The Authorizing Official issues one of three decisions: ATO Granted, ATO with Conditions, or Denial.
   </Step>
-  <Step n={6} title="Deployment Passport Issued">
+  <Step step="6" title="Deployment Passport Issued">
     Upon ATO grant, Second Front issues your Deployment Passport and activates your production environment.
   </Step>
 </Steps>

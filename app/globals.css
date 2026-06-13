@@ -156,7 +156,7 @@ body {
 }
 
 /* When a real <a> renders the circle (Step component), suppress ::before */
-.timeline-item:has(.timeline-step-anchor)::before {
+.timeline-item:has(.timeline-step-anchor:not(:empty))::before {
   display: none;
 }
 
