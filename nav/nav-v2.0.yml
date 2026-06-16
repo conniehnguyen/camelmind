@@ -182,6 +182,7 @@ nav:
         roles: []
 
   - label: "Release Notes"
+    dropdown: false
     slug: /v2.0/release-notes
     file: content/release-notes.mdx
     roles: []

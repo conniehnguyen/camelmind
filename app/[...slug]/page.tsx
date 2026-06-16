@@ -52,6 +52,10 @@ export default async function DocPage({ params }: Props) {
   const nav = getNavForVersion(versionId)   // correct nav for this version (or default)
   const { versions } = loadVersions()
 
+  const versionSlugs: Record<string, string[]> = Object.fromEntries(
+    versions.map((v) => [v.id, getSlugsFromConfig(getNavForVersion(v.id))])
+  )
+
   // All lookups use the version-appropriate nav
   const navEntry = getEntryBySlugFromConfig(nav, fullSlug)
   if (!navEntry) return notFound()
@@ -66,7 +70,7 @@ export default async function DocPage({ params }: Props) {
     // Logged in but wrong role → show access denied
     return (
       <div className="flex flex-col h-screen">
-        <TopNav nav={nav.nav} userRoles={session.roles} userName={session.name} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} />
+        <TopNav nav={nav.nav} userRoles={session.roles} userName={session.name} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} />
         <div className="flex flex-1 items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Restricted</h1>
@@ -87,7 +91,7 @@ export default async function DocPage({ params }: Props) {
 
   return (
     <div className="flex flex-col h-screen">
-      <TopNav nav={nav.nav} userRoles={session?.roles ?? []} userName={session?.name ?? null} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} />
+      <TopNav nav={nav.nav} userRoles={session?.roles ?? []} userName={session?.name ?? null} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar activeGroup={activeGroup} currentSlug={fullSlug} userRoles={session?.roles ?? []} />
         <main className="flex-1 overflow-y-auto">
@@ -102,7 +106,6 @@ export default async function DocPage({ params }: Props) {
               {frontmatter.description && (
                 <p className="text-gray-500 text-lg mb-8 leading-relaxed">{frontmatter.description}</p>
               )}
-              {isSectionRoot && sectionEntry && <SectionCards entry={sectionEntry} />}
               <div className="prose prose-gray mt-6">
                 <MDXRemote
                   source={source}
@@ -118,6 +121,7 @@ export default async function DocPage({ params }: Props) {
                   }}
                 />
               </div>
+              {isSectionRoot && sectionEntry && <SectionCards entry={sectionEntry} />}
               <PageNav activeGroup={activeGroup} currentSlug={fullSlug} />
             </article>
             <Toc entries={toc} />

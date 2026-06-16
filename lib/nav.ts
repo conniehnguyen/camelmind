@@ -9,7 +9,7 @@ export { isNavGroup } from "./nav-types"
 let _navCache: NavConfig | null = null
 
 export function loadNav(): NavConfig {
-  if (_navCache) return _navCache
+  if (process.env.NODE_ENV !== "development" && _navCache) return _navCache
   const navPath = path.join(process.cwd(), "nav", "nav.yml")
   const raw = fs.readFileSync(navPath, "utf-8")
   _navCache = yaml.load(raw) as NavConfig
@@ -25,7 +25,10 @@ export function getSlugsFromConfig(nav: NavConfig): string[] {
   const slugs: string[] = []
   for (const item of nav.nav) {
     if ("dropdown" in item) {
-      for (const entry of (item as NavGroup).items) {
+      const group = item as NavGroup
+      // noDropdown groups have a top-level slug (the direct link target)
+      if (group.noDropdown && group.slug) slugs.push(group.slug)
+      for (const entry of (group.items ?? [])) {
         slugs.push(entry.slug)
         if (entry.section) {
           for (const child of flattenChildren(entry.section)) {
@@ -50,7 +53,12 @@ export function getEntryBySlugFromConfig(nav: NavConfig, slug: string): (NavEntr
 
   for (const item of nav.nav) {
     if ("dropdown" in item) {
-      for (const entry of (item as NavGroup).items) {
+      const group = item as NavGroup
+      // noDropdown group: its top-level slug maps to the first item in the group
+      if (group.noDropdown && group.slug === normalized && group.items?.length) {
+        return group.items[0]
+      }
+      for (const entry of (group.items ?? [])) {
         if (entry.slug === normalized) return entry
         if (entry.section) {
           const match = flattenChildren(entry.section).find((c) => c.slug === normalized)
@@ -77,7 +85,8 @@ export function getGroupForSlugFromConfig(nav: NavConfig, slug: string): NavGrou
   for (const item of nav.nav) {
     if (!("dropdown" in item)) continue
     const group = item as NavGroup
-    for (const entry of group.items) {
+    if (group.noDropdown && group.slug === normalized) return group
+    for (const entry of (group.items ?? [])) {
       if (entry.slug === normalized) return group
       if (entry.section) {
         const match = flattenChildren(entry.section).find((c) => c.slug === normalized)
@@ -99,7 +108,7 @@ export function getSectionForSlugFromConfig(nav: NavConfig, slug: string): NavEn
 
   for (const item of nav.nav) {
     if (!("dropdown" in item)) continue
-    for (const entry of (item as NavGroup).items) {
+    for (const entry of ((item as NavGroup).items ?? [])) {
       if (entry.slug === normalized) return entry
       if (entry.section) {
         const match = flattenChildren(entry.section).find((c) => c.slug === normalized)

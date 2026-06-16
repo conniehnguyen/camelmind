@@ -1,3 +1,5 @@
+import { Icon } from "./Icon"
+
 type CalloutType = "tip" | "warning" | "important" | "note" | "danger" | "success"
 
 const labels: Record<CalloutType, string> = {
@@ -9,10 +11,32 @@ const labels: Record<CalloutType, string> = {
   success:   "Success",
 }
 
-export function Callout({ type = "note", children }: { type?: CalloutType; children: React.ReactNode }) {
+const defaultIcons: Record<CalloutType, string> = {
+  tip:       "lightbulb",
+  warning:   "triangle-alert",
+  important: "info",
+  note:      "notebook-pen",
+  danger:    "circle-x",
+  success:   "circle-check",
+}
+
+export function Callout({
+  type = "note",
+  icon,
+  children,
+}: {
+  type?: CalloutType
+  icon?: string
+  children: React.ReactNode
+}) {
+  const iconName = icon ?? defaultIcons[type]
+
   return (
     <div className={`callout ${type} my-4`}>
-      <div className="callout-header">{labels[type]}</div>
+      <div className="callout-header flex items-center gap-1.5">
+        <Icon name={iconName} size={13} />
+        {labels[type]}
+      </div>
       <div className="callout-body">{children}</div>
     </div>
   )

@@ -1,0 +1,35 @@
+---
+title: "June 2026"
+description: "Game Warden release notes for June 2026."
+roles: []
+---
+
+## v3.14.0 — June 10, 2026
+
+### New Features
+
+- **Managed Redis Cluster Mode**: Redis managed service now supports cluster mode for high-throughput workloads requiring horizontal scaling. Available for all environments. Request cluster mode via App Central under **Services > Redis > Configuration**.
+- **SBOM Upload in App Central**: Vendors targeting IL4/IL5 can now upload Software Bill of Materials (SBOM) files directly in App Central as part of the BoE submission flow. Supported formats: CycloneDX JSON, SPDX 2.3.
+- **Grafana Alerting Improvements**: Pre-built alert templates now include a "New Critical Finding Detected" alert that triggers immediately when a Critical CVE is identified by the pipeline scanner. Enable under **Observability > Alerts > Templates**.
+
+### Improvements
+
+- Pipeline scan results now include a remediation suggestion for each CVE finding, sourced from the NVD advisory database. The suggestion is displayed in the finding detail view in App Central.
+- BoE completion percentage now updates in real time as reviewers mark sections complete, without requiring a page refresh.
+- Harbor image detail pages now display the Cosign signature verification status alongside the vulnerability scan summary.
+- Vault secret rotation is now self-service for non-dynamic credentials. Org Admins can trigger manual rotation from **Organization Settings > Secrets**.
+
+### Bug Fixes
+
+- Fixed an issue where pipeline runs would remain in "In Progress" status indefinitely if the Harbor webhook delivery failed. Failed webhooks now retry automatically with exponential backoff.
+- Fixed a display issue in App Central where finding severity badges were rendered incorrectly in Safari on macOS.
+- Resolved a race condition in the namespace provisioning workflow that occasionally caused NetworkPolicy creation to fail silently during org setup.
+
+---
+
+## v3.13.1 — June 3, 2026
+
+### Bug Fixes
+
+- Patched a security vulnerability in the NGINX ingress controller (CVE-2026-1234, CVSS 8.1). All tenants are automatically protected; no action required.
+- Fixed an issue where Vault Agent injection annotations were not correctly parsed when the pod spec used `generateName` instead of `name`.

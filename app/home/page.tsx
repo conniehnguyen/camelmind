@@ -1,6 +1,6 @@
 import Link from "next/link"
-import { loadNav } from "@/lib/nav"
-import { loadVersions } from "@/lib/versions"
+import { loadNav, getSlugsFromConfig } from "@/lib/nav"
+import { loadVersions, getNavForVersion } from "@/lib/versions"
 import { getSession } from "@/lib/auth"
 import { TopNav } from "@/components/Nav/TopNav"
 import type { NavGroup } from "@/lib/nav-types"
@@ -64,6 +64,9 @@ export default async function HomePage() {
   const nav = loadNav()
   const { versions } = loadVersions()
   const session = await getSession()
+  const versionSlugs = Object.fromEntries(
+    versions.map((v) => [v.id, getSlugsFromConfig(getNavForVersion(v.id))])
+  )
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -74,18 +77,19 @@ export default async function HomePage() {
         versions={versions}
         currentVersionId={null}
         currentSlug="/home"
+        versionSlugs={versionSlugs}
       />
 
       <main className="flex-1 bg-white">
         {/* Hero */}
         <section className="bg-gray-950 text-white px-6 py-20 text-center">
-          <p className="text-blue-400 text-sm font-semibold uppercase tracking-widest mb-3">Second Front Systems</p>
+          <p className="text-gray-400 text-sm font-semibold uppercase tracking-widest mb-3">Second Front Systems</p>
           <h1 className="text-4xl font-bold mb-4">Game Warden Help Center</h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto mb-8">
-            Everything you need to onboard, deploy, and operate your application on Game Warden's secure DoD platform.
+            Everything you need to onboard, deploy, and operate your application on Game Warden platform, the Modern DevSecOps Platform for GovTech.
           </p>
           <div className="flex justify-center gap-3">
-            <Link href="/getting-started/onboarding/quickstart" className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+            <Link href="/getting-started/onboarding/quickstart" className="bg-white hover:bg-gray-100 text-gray-900 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
               Get Started
             </Link>
             <Link href="/getting-started/authorization-path" className="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors border border-gray-700">

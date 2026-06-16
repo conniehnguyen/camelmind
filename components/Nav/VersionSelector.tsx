@@ -8,9 +8,10 @@ type Props = {
   versions: Version[]
   currentVersionId: string | null
   currentSlug: string
+  versionSlugs: Record<string, string[]>
 }
 
-export function VersionSelector({ versions, currentVersionId, currentSlug }: Props) {
+export function VersionSelector({ versions, currentVersionId, currentSlug, versionSlugs }: Props) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
 
@@ -21,7 +22,13 @@ export function VersionSelector({ versions, currentVersionId, currentSlug }: Pro
     const bare = currentVersionId
       ? currentSlug.replace(new RegExp(`^/${currentVersionId}`), "") || "/"
       : currentSlug
-    router.push(`/${targetId}${bare}`)
+    const targetSlug = `/${targetId}${bare}`
+    const available = versionSlugs[targetId] ?? []
+    if (available.includes(targetSlug)) {
+      router.push(targetSlug)
+    } else {
+      router.push(available[0] ?? `/${targetId}`)
+    }
   }
 
   return (
@@ -46,13 +53,13 @@ export function VersionSelector({ versions, currentVersionId, currentSlug }: Pro
               key={v.id}
               onClick={() => navigateToVersion(v.id)}
               className={`w-full text-left flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-100 ${
-                v.id === currentVersionId ? "font-semibold text-blue-600" : ""
+                v.id === currentVersionId ? "font-semibold text-gray-900" : ""
               }`}
             >
               <span>{v.label}</span>
               <span className="flex items-center gap-1.5">
                 {v.badge && (
-                  <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">
+                  <span className="text-xs bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded-full">
                     {v.badge}
                   </span>
                 )}
@@ -66,7 +73,7 @@ export function VersionSelector({ versions, currentVersionId, currentSlug }: Pro
                     Stable
                   </span>
                 )}
-                {v.id === currentVersionId && <span className="text-blue-500">✓</span>}
+                {v.id === currentVersionId && <span className="text-gray-700">✓</span>}
               </span>
             </button>
           ))}

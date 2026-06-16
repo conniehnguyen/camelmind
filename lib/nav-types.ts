@@ -17,6 +17,8 @@ export type NavEntry = {
 export type NavGroup = {
   label: string
   dropdown: boolean
+  noDropdown?: boolean  // show as direct link in top nav, not a dropdown button
+  slug?: string         // href for the direct link when noDropdown is true
   items: NavEntry[]
 }
 

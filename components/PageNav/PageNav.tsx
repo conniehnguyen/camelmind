@@ -46,7 +46,7 @@ export function PageNav({ activeGroup, currentSlug }: Props) {
           className="flex flex-col items-start group max-w-[45%]"
         >
           <span className="text-xs text-gray-400 mb-1 group-hover:text-gray-600">← Previous</span>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
+          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
             {prev.label}
           </span>
         </Link>
@@ -58,7 +58,7 @@ export function PageNav({ activeGroup, currentSlug }: Props) {
           className="flex flex-col items-end group max-w-[45%]"
         >
           <span className="text-xs text-gray-400 mb-1 group-hover:text-gray-600">Next →</span>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
+          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
             {next.label}
           </span>
         </Link>

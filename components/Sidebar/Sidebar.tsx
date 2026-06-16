@@ -21,7 +21,7 @@ function DocLink({ item, currentSlug }: { item: NavChild; currentSlug: string })
     <li>
       <Link
         href={item.slug}
-        style={isActive ? { borderColor: "var(--sf-green)", color: "var(--sf-green-dim)" } : {}}
+        style={isActive ? { borderColor: "var(--sf-active-border)", color: "var(--sf-active)" } : {}}
         className={`block py-1.5 pl-4 pr-3 text-sm border-l-2 transition-colors ${
           isActive
             ? "font-medium bg-black/5"
@@ -60,7 +60,7 @@ function SectionRow({
       <div className="mb-0.5">
         <Link
           href={section.slug}
-          style={currentSlug === section.slug ? { borderColor: "var(--sf-green)", color: "var(--sf-green-dim)" } : {}}
+          style={currentSlug === section.slug ? { borderColor: "var(--sf-active-border)", color: "var(--sf-active)" } : {}}
         className={`block py-1.5 pl-4 pr-2 text-sm border-l-2 transition-colors ${
             currentSlug === section.slug
               ? "font-medium bg-black/5"
@@ -114,13 +114,20 @@ function CategoryBlock({
   userRoles: string[]
 }) {
   const sections = (entry.section ?? []).filter((s) => canSee(s.roles, userRoles))
+  const isCategoryActive = currentSlug === entry.slug
 
   return (
     <div className="mb-4">
-      {/* Category label — ALL CAPS, no collapse */}
-      <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-widest text-gray-400 select-none">
+      {/* Category label — ALL CAPS, highlighted when on the category landing page */}
+      <Link
+        href={entry.slug}
+        style={isCategoryActive ? { color: "var(--sf-active)" } : {}}
+        className={`block px-2 pb-1 text-xs font-semibold uppercase tracking-widest transition-colors select-none ${
+          isCategoryActive ? "" : "text-gray-400 hover:text-gray-600"
+        }`}
+      >
         {entry.label}
-      </p>
+      </Link>
 
       {sections.map((section) => (
         <SectionRow

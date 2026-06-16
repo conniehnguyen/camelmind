@@ -56,18 +56,49 @@ Before integrating Bedrock with your GW-deployed application:
     Submit a support ticket requesting a Vault secret path provisioned for your namespace (e.g., `secret/your-app/aws-bedrock`). Once provisioned, write your credentials to Vault and configure your application to read them via the Vault Agent sidecar environment variable injection.
   </Step>
   <Step step="5" title="Configure Your Application">
-    Use the AWS SDK for your language (Python `boto3`, Node.js `@aws-sdk/client-bedrock-runtime`, Java `software.amazon.awssdk:bedrockruntime`) and configure it to read credentials from environment variables injected by Vault:
+    Use the AWS SDK for your language and configure it to read credentials from environment variables injected by Vault:
 
-    ```python
-    import boto3
+    <Tabs>
+      <Tab label="Python">
 
-    client = boto3.client(
-        service_name="bedrock-runtime",
-        region_name="us-east-1",
-        aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-    )
-    ```
+        ```python
+        import boto3, os
+
+        client = boto3.client(
+            service_name="bedrock-runtime",
+            region_name="us-east-1",
+            aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+            aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+        )
+        ```
+
+      </Tab>
+      <Tab label="Node.js">
+
+        ```js
+        import { BedrockRuntimeClient } from "@aws-sdk/client-bedrock-runtime";
+
+        const client = new BedrockRuntimeClient({
+          region: "us-east-1",
+          credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+          },
+        });
+        ```
+
+      </Tab>
+      <Tab label="Java">
+
+        ```java
+        BedrockRuntimeClient client = BedrockRuntimeClient.builder()
+            .region(Region.US_EAST_1)
+            .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+            .build();
+        ```
+
+      </Tab>
+    </Tabs>
   </Step>
   <Step step="6" title="Test Connectivity">
     Deploy a test pod in your GW namespace and verify that you can successfully call the Bedrock API. If connectivity fails, check your egress NetworkPolicy and confirm the allowlist rule was applied.
