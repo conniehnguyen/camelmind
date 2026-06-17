@@ -364,11 +364,31 @@ Release Notes
 
 **Homepage** (`/home`, inspired by LaunchDarkly docs)
 - Dark hero section with "Get Started" and "Choose Your Path" CTAs
-- 3 feature cards: Authorization Paths, Entrance Criteria, App Central
-- "Start here" quick links + "What's new" columns
-- Deployment Paths section (DoW/FedRAMP/Commercial cards)
-- Resources section (Slack, Training, Support, Release Notes)
+- 3 feature cards: Entrance Criteria, Platform Architecture, Onboarding Process
+- "News from Second Front" + "What's new in GW" two-column section
+- "From Second Front" resource cards (Events, Podcast, Customer Stories, Library) with Lucide icons
 - Footer with copyright
+
+**Mobile navigation**
+- Hamburger menu in top nav on mobile — sidebar hidden, desktop nav hidden
+- Slide-in dark drawer with expandable nav groups (chevron toggle)
+- Drawer auto-expands active group and highlights current page on open
+- Version selector and sign in/out in drawer footer
+- Body scroll locked when drawer is open; auto-closes on navigation
+
+**Doc page actions** (`components/DocActions/DocActions.tsx`)
+- "View as Markdown" and "Download Markdown" links served via `/api/raw`
+- Optional "Download PDF" link from `download_pdf` frontmatter field
+- Buttons hidden in offline builds (no server available)
+
+**Image zoom**
+- Click any markdown image to zoom in-place (1.7× scale); click again to zoom out
+- Implemented via `components/ZoomImages/ZoomImages.tsx` — re-binds on route change
+
+**Details / collapsible component** (`components/mdx/Details.tsx`)
+- Anchor-linkable: `<Details id="my-section" summary="...">` renders with a copy-link button
+- Auto-opens and scrolls into view when URL hash matches the `id`
+- Chevron animates open/close
 
 **Content**
 - 38 substantive placeholder MDX docs written across all sections
@@ -415,10 +435,72 @@ roles: ["vendor", "admin"]  // everything
 | **Real content migration** | MkDocs `.md` files need converting to MDX, nav.yml needs full population |
 | **MkDocs admonitions → Callout** | Find/replace `!!!tip` → `<Callout type="tip">` across all docs |
 | **MkDocs timeline divs** | Timeline CSS ported; existing `<div class="timeline">` blocks will render |
-| **Search index performance** | Currently rebuilds on every cold start — consider persisting to a JSON file at build time |
+| **Offline ZIP in CI** | `build-offline.sh` runs manually; wire into CI to auto-publish ZIPs on release |
 | **Dark mode** | Not implemented |
-| **Mobile nav** | Top nav collapses poorly on small screens |
 | **Custom 404 page** | Uses Next.js default |
+
+### Offline doc site build
+
+Authenticated users can download a self-contained offline ZIP of any stable version directly from the version selector (download icon appears on hover). The ZIP contains pre-rendered static HTML — no Next.js server required.
+
+**Building a package**
+
+```bash
+# From the repo root — builds v2.0 by default
+./scripts/build-offline.sh v2.0
+./scripts/build-offline.sh v1.9
+
+# Output: offline-builds/gw-helpcenter-<version>-offline.zip
+```
+
+The script:
+1. Pre-generates `public/search-index.json` (full-text search index)
+2. Temporarily stashes server-only API routes (`/api/raw`, `/api/download`, `/api/search`, `/api/auth`) outside `app/` so `next build` doesn't reject them in static export mode
+3. Runs `OFFLINE_MODE=true next build` → outputs static HTML to `out/`
+4. Writes `launch.sh` (Mac/Linux) and `launch.bat` (Windows) launcher scripts into `out/`
+5. Zips `out/` to `offline-builds/gw-helpcenter-<version>-offline.zip`
+6. Restores stashed routes on exit (even on error, via `trap`)
+
+**How users launch it**
+
+Unzip the package, then:
+
+| Platform | Steps |
+|---|---|
+| **Mac / Linux** | Double-click `launch.sh`, or run `./launch.sh` in Terminal |
+| **Windows** | Double-click `launch.bat` |
+
+The launcher starts a local HTTP server on port **8765** and opens `http://localhost:8765/home/` in the browser automatically. It uses **Python 3 `http.server`** (pre-installed on most systems) with a fallback to Node/npx. No internet connection required after download.
+
+**How offline mode differs from the live site**
+
+| Feature | Live site | Offline package |
+|---|---|---|
+| Auth | Keycloak SSO (prod) / mock cookie (dev) | Bypassed — full access granted at download time |
+| Search | `/api/search` (server-side, runtime) | `/search-index.json` (pre-built at build time) |
+| "View/Download Markdown" buttons | Available via `/api/raw` | Hidden — no server |
+| "Download PDF" button | Available if `download_pdf` set in frontmatter | Available (static link) |
+| Offline download link | Shown in version selector for logged-in users | N/A |
+
+**Key env vars**
+
+| Var | Effect |
+|---|---|
+| `OFFLINE_MODE=true` | Enables `output: export`, bypasses auth, hides Markdown API buttons |
+| `TARGET_VERSION=v2.0` | (Reserved for future use — scopes build to one version) |
+
+**Download endpoint (live site)**
+
+`GET /api/download?version=v2.0` — auth-gated; streams pre-built ZIP from `offline-builds/`. Returns 403 for unstable versions, 404 if ZIP hasn't been built yet. Only visible to logged-in users (download icon hidden otherwise).
+
+**What's gitignored**
+
+```
+offline-builds/          # built ZIPs (rebuild from script)
+public/search-index.json # generated at build time
+```
+
+---
 
 ### Key files to know
 
@@ -435,11 +517,21 @@ roles: ["vendor", "admin"]  // everything
 | `app/[...slug]/page.tsx` | Main doc page renderer |
 | `app/home/page.tsx` | Homepage |
 | `app/api/search/route.ts` | Search API — builds full-text index from all MDX |
+| `app/api/raw/route.ts` | Serves raw MDX source files (auth-unrestricted, path-restricted) |
+| `app/api/download/route.ts` | Auth-gated offline ZIP download endpoint |
 | `app/globals.css` | Global CSS — callout colors, prose overrides, timeline styles |
-| `components/Search/SearchModal.tsx` | ⌘K search modal + trigger button |
+| `components/Nav/TopNav.tsx` | Top nav — desktop dropdowns + mobile hamburger |
+| `components/Nav/MobileDrawer.tsx` | Mobile slide-in nav drawer |
+| `components/Nav/VersionSelector.tsx` | Version switcher + offline download icon |
+| `components/Search/SearchModal.tsx` | ⌘K search modal — falls back to search-index.json offline |
+| `components/DocActions/DocActions.tsx` | View/Download Markdown + PDF buttons |
+| `components/ZoomImages/ZoomImages.tsx` | Click-to-zoom for markdown images |
+| `components/mdx/Details.tsx` | Anchor-linkable collapsible `<details>` component |
 | `components/Toc/Toc.tsx` | Right-side sticky ToC |
 | `components/Breadcrumbs/Breadcrumbs.tsx` | Page breadcrumbs |
 | `components/PageNav/PageNav.tsx` | Prev/Next page nav |
 | `components/SectionCards/SectionCards.tsx` | Child cards on section landing pages |
 | `components/Code/CodeBlock.tsx` | Code block with copy button |
+| `scripts/build-offline.sh` | Builds versioned offline ZIP — run this to generate packages |
+| `scripts/build-search-index.ts` | Pre-generates `public/search-index.json` from MDX content |
 
