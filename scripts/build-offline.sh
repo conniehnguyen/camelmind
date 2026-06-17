@@ -65,22 +65,119 @@ stash_routes
 echo "  → Running next build (OFFLINE_MODE=true, TARGET_VERSION=$VERSION)..."
 OFFLINE_MODE=true TARGET_VERSION="$VERSION" npx next build
 
-# 3. Write a minimal README into the export
+# 3. Write launcher scripts and README into the export
+
+cat > "$OUT_DIR/launch.sh" <<'LAUNCHER'
+#!/usr/bin/env bash
+# Game Warden Help Center — offline launcher (Mac / Linux)
+PORT=8765
+URL="http://localhost:$PORT/home/"
+
+# Try Python 3 first (available on most systems without internet)
+if command -v python3 &>/dev/null; then
+  echo "Starting local server on $URL"
+  python3 -m http.server $PORT &
+  SERVER_PID=$!
+  sleep 1
+  # Open browser
+  if command -v open &>/dev/null; then open "$URL"
+  elif command -v xdg-open &>/dev/null; then xdg-open "$URL"
+  fi
+  echo "Press Ctrl+C to stop the server."
+  wait $SERVER_PID
+# Fall back to Python 2
+elif command -v python &>/dev/null; then
+  echo "Starting local server on $URL"
+  python -m SimpleHTTPServer $PORT &
+  SERVER_PID=$!
+  sleep 1
+  if command -v open &>/dev/null; then open "$URL"
+  elif command -v xdg-open &>/dev/null; then xdg-open "$URL"
+  fi
+  echo "Press Ctrl+C to stop the server."
+  wait $SERVER_PID
+# Fall back to Node / npx
+elif command -v npx &>/dev/null; then
+  echo "Starting local server on $URL"
+  if command -v open &>/dev/null; then sleep 2 && open "$URL" &
+  elif command -v xdg-open &>/dev/null; then sleep 2 && xdg-open "$URL" &
+  fi
+  npx serve . -p $PORT
+else
+  echo "ERROR: Python 3, Python 2, or Node.js is required to run this package."
+  echo "Install Python from https://www.python.org or Node.js from https://nodejs.org"
+  exit 1
+fi
+LAUNCHER
+chmod +x "$OUT_DIR/launch.sh"
+
+cat > "$OUT_DIR/launch.bat" <<'LAUNCHER'
+@echo off
+REM Game Warden Help Center — offline launcher (Windows)
+set PORT=8765
+set URL=http://localhost:%PORT%/home/
+
+REM Try Python 3
+python --version >nul 2>&1
+if %errorlevel% == 0 (
+    echo Starting local server on %URL%
+    start "" "%URL%"
+    python -m http.server %PORT%
+    goto :end
+)
+
+REM Try Python via py launcher
+py --version >nul 2>&1
+if %errorlevel% == 0 (
+    echo Starting local server on %URL%
+    start "" "%URL%"
+    py -m http.server %PORT%
+    goto :end
+)
+
+REM Try npx (Node.js)
+npx --version >nul 2>&1
+if %errorlevel% == 0 (
+    echo Starting local server on %URL%
+    start "" "%URL%"
+    npx serve . -p %PORT%
+    goto :end
+)
+
+echo ERROR: Python or Node.js is required to run this package.
+echo Install Python from https://www.python.org or Node.js from https://nodejs.org
+pause
+:end
+LAUNCHER
+
 cat > "$OUT_DIR/README.txt" <<EOF
 Game Warden Help Center — Offline Package ($VERSION)
 ====================================================
 
-To browse the docs locally, run:
+QUICK START
+-----------
+Mac / Linux:  Double-click launch.sh  (or run: ./launch.sh in Terminal)
+Windows:      Double-click launch.bat
 
-    npx serve .
+This opens a local web server at http://localhost:8765 and launches your
+browser automatically. Press Ctrl+C (or close Terminal) to stop.
 
-Then open http://localhost:3000 in your browser.
+REQUIREMENTS
+------------
+Python 3 is recommended (pre-installed on most Macs and Linux systems).
+Windows users may need to install Python from https://www.python.org
+Node.js (https://nodejs.org) works as a fallback on all platforms.
 
-Alternatively, open index.html directly in your browser (some features
-like search may be limited without a local server).
+SEARCH
+------
+Full-text search works offline — no internet connection required.
 
-This package was generated for authenticated Game Warden users.
-Do not redistribute without authorization.
+NOTES
+-----
+- Do not open index.html directly in your browser; navigation will break.
+  Always use the launcher or start a local server first.
+- This package was generated for authenticated Game Warden users.
+  Do not redistribute without authorization.
 EOF
 
 # 4. Zip the output
