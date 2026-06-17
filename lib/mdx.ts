@@ -7,6 +7,7 @@ export type FrontMatter = {
   description?: string
   roles?: string[]
   tags?: string[]
+  download_pdf?: string
 }
 
 export type TocEntry = {

@@ -19,6 +19,8 @@ import { Toc } from "@/components/Toc/Toc"
 import { Breadcrumbs } from "@/components/Breadcrumbs/Breadcrumbs"
 import { PageNav } from "@/components/PageNav/PageNav"
 import { SectionCards } from "@/components/SectionCards/SectionCards"
+import { DocActions } from "@/components/DocActions/DocActions"
+import { ZoomImages } from "@/components/ZoomImages/ZoomImages"
 import { mdxComponents } from "@/components/mdx"
 import type { NavGroup, NavEntry } from "@/lib/nav-types"
 
@@ -104,8 +106,10 @@ export default async function DocPage({ params }: Props) {
               />
               <h1 className="text-3xl font-bold mb-2 text-gray-900">{frontmatter.title}</h1>
               {frontmatter.description && (
-                <p className="text-gray-500 text-lg mb-8 leading-relaxed">{frontmatter.description}</p>
+                <p className="text-gray-500 text-lg mb-6 leading-relaxed">{frontmatter.description}</p>
               )}
+              <DocActions file={navEntry.file} downloadPdf={frontmatter.download_pdf} />
+              <ZoomImages />
               <div className="prose prose-gray mt-6">
                 <MDXRemote
                   source={source}

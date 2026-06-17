@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { ClipboardList, ShieldCheck, Rocket, ExternalLink, CalendarDays, Mic, Users, BookOpen } from "lucide-react"
 import { loadNav, getSlugsFromConfig } from "@/lib/nav"
 import { loadVersions, getNavForVersion } from "@/lib/versions"
 import { getSession } from "@/lib/auth"
@@ -7,35 +8,33 @@ import type { NavGroup } from "@/lib/nav-types"
 
 const FEATURE_CARDS = [
   {
-    icon: "🛡️",
-    title: "Authorization Paths",
-    description: "Choose your deployment environment — DoW (IL4/IL5), FedRAMP Moderate, or Commercial — and follow a tailored onboarding track.",
-    href: "/getting-started/authorization-path",
-    cta: "Choose your path",
-  },
-  {
-    icon: "📋",
+    Icon: ClipboardList,
     title: "Entrance Criteria",
     description: "Understand the technical and security requirements your application must meet before onboarding to Game Warden.",
     href: "/getting-started/entrance-criteria",
     cta: "Review requirements",
   },
   {
-    icon: "🚀",
-    title: "App Central",
-    description: "Submit applications, complete your Body of Evidence, manage findings, and track your ATO progress — all from one place.",
-    href: "/getting-started/gw-app/app-central",
-    cta: "Open App Central docs",
+    Icon: ShieldCheck,
+    title: "Platform Architecture & Security",
+    description: "Explore Game Warden's infrastructure, managed services, security controls, and compliance posture across DoW, FedRAMP, and Commercial environments.",
+    href: "/platform/architecture",
+    cta: "Explore the platform",
+  },
+  {
+    Icon: Rocket,
+    title: "Onboarding Process",
+    description: "Follow the step-by-step onboarding guide — from account creation and access control to your first application submission in App Central.",
+    href: "/getting-started/onboarding",
+    cta: "Start onboarding",
   },
 ]
 
-const QUICK_LINKS = [
-  { label: "Quickstart Guide", href: "/getting-started/onboarding/quickstart" },
-  { label: "Create Your Account", href: "/getting-started/onboarding/create-account" },
-  { label: "Impact Levels Overview", href: "/getting-started/authorization-path/dow/impact-levels" },
-  { label: "Body of Evidence", href: "/getting-started/gw-app/boe" },
-  { label: "Security Findings", href: "/getting-started/gw-app/findings" },
-  { label: "Platform Architecture", href: "/platform/architecture" },
+const NEWS = [
+  { title: "Second Front Announces Strategic Partnership with Palantir", date: "June 2026", href: "https://www.secondfront.com/resources/news/" },
+  { title: "Game Warden Now Supports FedRAMP High Workloads", date: "May 2026", href: "https://www.secondfront.com/resources/news/" },
+  { title: "2F Wins 2026 DIU Defense Tech Award", date: "April 2026", href: "https://www.secondfront.com/resources/news/" },
+  { title: "New AI-Assisted Compliance Tooling Available in App Central", date: "March 2026", href: "https://www.secondfront.com/resources/news/" },
 ]
 
 const WHATS_NEW = [
@@ -47,17 +46,12 @@ const WHATS_NEW = [
   { date: "April 2026", summary: "Prisma Cloud upgraded to v33 — image rescan required", href: "/release-notes" },
 ]
 
-const DEPLOYMENT_PATHS = [
-  { label: "DoW / IL4", docs: ["Impact Levels", "ATO & Deployment Passport", "Platform One Access"], href: "/getting-started/authorization-path/dow" },
-  { label: "FedRAMP", docs: ["Account Setup", "Access Control", "POA&M Guide"], href: "/getting-started/authorization-path/fedramp" },
-  { label: "Commercial", docs: ["Overview", "Account Setup", "Security Policies"], href: "/getting-started/authorization-path/commercial" },
-]
 
-const COMMUNITY = [
-  { icon: "💬", title: "Slack", description: "Connect with the Second Front team and other vendors on the #game-warden channel.", href: "#" },
-  { icon: "🎓", title: "Training", description: "Access guided training modules for vendors, org admins, and second front staff.", href: "#" },
-  { icon: "🎫", title: "Support Tickets", description: "Open a support ticket directly from App Central to get help from the GW team.", href: "/getting-started/gw-app/support-tickets" },
-  { icon: "📄", title: "Release Notes", description: "Stay current with the latest platform updates, new features, and breaking changes.", href: "/release-notes" },
+const FROM_2F = [
+  { Icon: CalendarDays, title: "Events", description: "Conferences, webinars, and live sessions hosted by Second Front.", href: "https://www.secondfront.com/resources/events/" },
+  { Icon: Mic, title: "Podcast", description: "Conversations on defense tech, software delivery, and GovTech innovation.", href: "https://www.secondfront.com/resources/podcast/" },
+  { Icon: Users, title: "Customer Stories", description: "How defense software teams deploy and scale with Game Warden.", href: "https://www.secondfront.com/resources/customer-stories/" },
+  { Icon: BookOpen, title: "Library", description: "Whitepapers, guides, and research from the Second Front team.", href: "https://www.secondfront.com/resources/" },
 ]
 
 export default async function HomePage() {
@@ -104,29 +98,31 @@ export default async function HomePage() {
           <section>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {FEATURE_CARDS.map((card) => (
-                <Link key={card.href} href={card.href} className="group flex flex-col gap-3 p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
-                  <span className="text-3xl">{card.icon}</span>
-                  <h3 className="font-semibold text-gray-900">{card.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed flex-1">{card.description}</p>
-                  <span className="text-sm text-blue-600 font-medium group-hover:underline">{card.cta} →</span>
+                <Link key={card.href} href={card.href} className="group flex flex-col gap-4 p-7 rounded-xl border border-gray-200 hover:border-gray-400 hover:shadow-sm transition-all">
+                  <card.Icon size={28} className="text-gray-700 shrink-0" />
+                  <h3 className="text-lg font-semibold text-gray-900">{card.title}</h3>
+                  <p className="text-base text-gray-500 leading-relaxed flex-1">{card.description}</p>
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">{card.cta} →</span>
                 </Link>
               ))}
             </div>
           </section>
 
-          {/* Quick links + What's new */}
+          {/* News + What's new */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* Quick links */}
+            {/* News from Second Front */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Start here</h2>
-              <p className="text-sm text-gray-500 mb-4">Common starting points for vendors onboarding to Game Warden.</p>
-              <ul className="space-y-2">
-                {QUICK_LINKS.map((link) => (
-                  <li key={link.href}>
-                    <Link href={link.href} className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                      <span className="text-gray-300">→</span>
-                      {link.label}
-                    </Link>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">News from Second Front</h2>
+                <a href="https://www.secondfront.com/resources/news/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 transition-colors">All news <ExternalLink size={13} /></a>
+              </div>
+              <ul className="space-y-4">
+                {NEWS.map((item, i) => (
+                  <li key={i}>
+                    <a href={item.href} target="_blank" rel="noopener noreferrer" className="group block">
+                      <p className="text-base text-gray-800 group-hover:text-gray-950 font-medium leading-snug transition-colors">{item.title}</p>
+                      <p className="text-sm text-gray-400 mt-0.5">{item.date}</p>
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -135,14 +131,14 @@ export default async function HomePage() {
             {/* What's new */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">What&apos;s new</h2>
-                <Link href="/release-notes" className="text-xs text-blue-600 hover:underline">See all updates →</Link>
+                <h2 className="text-xl font-semibold text-gray-900">What&apos;s new</h2>
+                <Link href="/release-notes" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">See all updates →</Link>
               </div>
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {WHATS_NEW.map((item, i) => (
-                  <li key={i} className="flex gap-3 text-sm">
-                    <span className="text-gray-400 shrink-0 w-20">{item.date}</span>
-                    <Link href={item.href} className="text-gray-700 hover:text-blue-600 transition-colors leading-snug">
+                  <li key={i} className="flex gap-3">
+                    <span className="text-sm text-gray-400 shrink-0 w-24 pt-0.5">{item.date}</span>
+                    <Link href={item.href} className="text-base text-gray-700 hover:text-gray-950 transition-colors leading-snug">
                       {item.summary}
                     </Link>
                   </li>
@@ -151,38 +147,19 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* Deployment paths */}
+          {/* From Second Front */}
           <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Deployment Paths</h2>
-            <p className="text-sm text-gray-500 mb-6">Game Warden supports three deployment environments. Select yours to see the relevant documentation.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {DEPLOYMENT_PATHS.map((path) => (
-                <Link key={path.href} href={path.href} className="group p-5 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 transition-all">
-                  <h3 className="font-semibold text-gray-900 mb-3 group-hover:text-blue-700">{path.label}</h3>
-                  <ul className="space-y-1">
-                    {path.docs.map((doc) => (
-                      <li key={doc} className="text-xs text-gray-500 flex items-center gap-1.5">
-                        <span className="w-1 h-1 rounded-full bg-gray-300 shrink-0" />
-                        {doc}
-                      </li>
-                    ))}
-                  </ul>
-                  <span className="text-xs text-blue-500 mt-3 block opacity-0 group-hover:opacity-100 transition-opacity">View docs →</span>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          {/* Community / Resources */}
-          <section>
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Resources</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">From Second Front</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {COMMUNITY.map((item) => (
-                <Link key={item.title} href={item.href} className="group flex flex-col gap-2 p-4 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50/30 transition-all">
-                  <span className="text-2xl">{item.icon}</span>
-                  <h3 className="text-sm font-semibold text-gray-800 group-hover:text-blue-700">{item.title}</h3>
-                  <p className="text-xs text-gray-500 leading-relaxed">{item.description}</p>
-                </Link>
+              {FROM_2F.map((item) => (
+                <a key={item.title} href={item.href} target="_blank" rel="noopener noreferrer" className="group flex flex-col gap-3 p-5 rounded-xl border border-gray-200 hover:border-gray-400 hover:shadow-sm transition-all">
+                  <div className="flex items-center justify-between">
+                    <item.Icon size={22} className="text-gray-500" />
+                    <ExternalLink size={13} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
+                  </div>
+                  <h3 className="text-base font-semibold text-gray-800 group-hover:text-gray-950">{item.title}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">{item.description}</p>
+                </a>
               ))}
             </div>
           </section>

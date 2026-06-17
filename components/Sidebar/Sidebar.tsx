@@ -153,8 +153,8 @@ function GroupSidebar({
   const visibleItems = group.items.filter((i) => canSee(i.roles, userRoles))
 
   return (
-    <aside className="w-56 shrink-0 border-r border-gray-200 overflow-y-auto">
-      <div className="px-3 py-4">
+    <aside className="w-72 shrink-0 border-r border-gray-200 overflow-y-auto">
+      <div className="px-4 py-4">
         {visibleItems.map((entry) => (
           <CategoryBlock
             key={entry.slug}
@@ -180,6 +180,6 @@ export function Sidebar({ activeGroup, currentSlug, userRoles }: Props) {
   }
 
   return (
-    <aside className="w-56 shrink-0 border-r border-gray-200 p-4 overflow-y-auto" />
+    <aside className="w-72 shrink-0 border-r border-gray-200 p-4 overflow-y-auto" />
   )
 }

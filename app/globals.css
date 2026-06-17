@@ -237,3 +237,19 @@ body {
   margin-top: 0.5rem;
 }
 
+
+/* Image zoom */
+.prose img {
+  cursor: zoom-in;
+  transition: transform 0.3s ease-in-out;
+  position: relative;
+  z-index: 1;
+  border-radius: 6px;
+}
+
+.prose img.zoomed {
+  transform: scale(1.7);
+  cursor: zoom-out;
+  z-index: 9999;
+  position: relative;
+}

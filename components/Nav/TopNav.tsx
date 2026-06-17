@@ -49,7 +49,8 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
 
       {nav.map((item) => {
         if (isNavGroup(item)) {
-          if (item.noDropdown && item.slug) {
+          // noDropdown groups, or versioned nav entries with dropdown:false and no items
+          if ((item.noDropdown || !item.items) && item.slug) {
             return (
               <Link key={item.label} href={item.slug} className="text-sm font-medium hover:text-gray-300">
                 {item.label}
@@ -57,7 +58,7 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
             )
           }
 
-          const visibleItems = item.items.filter((i) => canSee(i.roles))
+          const visibleItems = (item.items ?? []).filter((i) => canSee(i.roles))
           if (visibleItems.length === 0) return null
 
           return (
