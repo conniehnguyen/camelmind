@@ -47,13 +47,49 @@ export function SearchModal() {
   }, [])
 
   const search = useCallback(async (q: string, group: string, role: string) => {
-    const params = new URLSearchParams()
-    if (q) params.set("q", q)
-    if (group) params.set("group", group)
-    if (role) params.set("role", role)
+    let data: { results: SearchResult[]; groups: string[] }
 
-    const res = await fetch(`/api/search?${params}`)
-    const data = await res.json()
+    // Try the live API; fall back to the pre-built static index (offline builds)
+    try {
+      const params = new URLSearchParams()
+      if (q) params.set("q", q)
+      if (group) params.set("group", group)
+      if (role) params.set("role", role)
+      const res = await fetch(`/api/search?${params}`)
+      if (!res.ok) throw new Error("api unavailable")
+      data = await res.json()
+    } catch {
+      const allDocs: (SearchResult & { body: string })[] = await fetch("/search-index.json").then((r) => r.json())
+      const terms = q.toLowerCase().trim().split(/\s+/).filter(Boolean)
+      const uniqueGroups = [...new Set(allDocs.map((d) => d.group).filter((g): g is string => Boolean(g)))]
+
+      if (!terms.length) {
+        data = { results: [], groups: uniqueGroups }
+      } else {
+        const scored = allDocs
+          .filter((doc) => {
+            if (group && doc.group !== group) return false
+            if (role && !doc.roles.includes(role) && doc.roles.length > 0) return false
+            return true
+          })
+          .map((doc) => {
+            let score = 0
+            for (const term of terms) {
+              if (doc.title.toLowerCase().includes(term)) score += 10
+              if ((doc.description ?? "").toLowerCase().includes(term)) score += 5
+              if (doc.body.toLowerCase().includes(term)) score += 1
+            }
+            const idx = doc.body.toLowerCase().indexOf(terms[0])
+            const excerpt = doc.description || (idx >= 0 ? doc.body.slice(Math.max(0, idx - 30), idx + 100).trim() : "")
+            return { ...doc, score, excerpt }
+          })
+          .filter((d) => d.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 10)
+        data = { results: scored, groups: uniqueGroups }
+      }
+    }
+
     setResults(data.results ?? [])
     if (data.groups) setGroups(data.groups)
     setSelected(0)

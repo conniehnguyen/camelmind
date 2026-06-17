@@ -19,7 +19,15 @@ export async function createSession(user: SessionUser): Promise<string> {
     .sign(SECRET)
 }
 
+// Offline builds ship with auth bypassed — the user already authenticated when downloading
+const OFFLINE_SESSION: SessionUser = {
+  name: "Offline User",
+  email: "",
+  roles: ["vendor", "admin"],
+}
+
 export async function getSession(): Promise<SessionUser | null> {
+  if (process.env.OFFLINE_MODE === "true") return OFFLINE_SESSION
   const cookieStore = await cookies()
   const token = cookieStore.get(COOKIE_NAME)?.value
   if (!token) return null

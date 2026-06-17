@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { Download } from "lucide-react"
 import type { Version } from "@/lib/versions"
 
 type Props = {
@@ -9,9 +10,10 @@ type Props = {
   currentVersionId: string | null
   currentSlug: string
   versionSlugs: Record<string, string[]>
+  isLoggedIn?: boolean
 }
 
-export function VersionSelector({ versions, currentVersionId, currentSlug, versionSlugs }: Props) {
+export function VersionSelector({ versions, currentVersionId, currentSlug, versionSlugs, isLoggedIn }: Props) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
 
@@ -49,33 +51,44 @@ export function VersionSelector({ versions, currentVersionId, currentSlug, versi
       {open && (
         <div className="absolute top-full right-0 mt-1 w-52 bg-white text-gray-900 rounded shadow-lg z-50 py-1 border border-gray-200">
           {versions.map((v) => (
-            <button
-              key={v.id}
-              onClick={() => navigateToVersion(v.id)}
-              className={`w-full text-left flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-100 ${
-                v.id === currentVersionId ? "font-semibold text-gray-900" : ""
-              }`}
-            >
-              <span>{v.label}</span>
-              <span className="flex items-center gap-1.5">
-                {v.badge && (
-                  <span className="text-xs bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded-full">
-                    {v.badge}
-                  </span>
-                )}
-                {!v.stable && !v.badge && (
-                  <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full">
-                    Unstable
-                  </span>
-                )}
-                {v.stable && (
-                  <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">
-                    Stable
-                  </span>
-                )}
-                {v.id === currentVersionId && <span className="text-gray-700">✓</span>}
-              </span>
-            </button>
+            <div key={v.id} className="flex items-center group">
+              <button
+                onClick={() => navigateToVersion(v.id)}
+                className={`flex-1 text-left flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-100 ${
+                  v.id === currentVersionId ? "font-semibold text-gray-900" : ""
+                }`}
+              >
+                <span>{v.label}</span>
+                <span className="flex items-center gap-1.5">
+                  {v.badge && (
+                    <span className="text-xs bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded-full">
+                      {v.badge}
+                    </span>
+                  )}
+                  {!v.stable && !v.badge && (
+                    <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full">
+                      Unstable
+                    </span>
+                  )}
+                  {v.stable && (
+                    <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">
+                      Stable
+                    </span>
+                  )}
+                  {v.id === currentVersionId && <span className="text-gray-700">✓</span>}
+                </span>
+              </button>
+              {isLoggedIn && v.stable && (
+                <a
+                  href={`/api/download?version=${v.id}`}
+                  title={`Download ${v.label} for offline use`}
+                  className="pr-3 pl-1 py-2 text-gray-400 hover:text-gray-700 transition-colors opacity-0 group-hover:opacity-100"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Download size={14} />
+                </a>
+              )}
+            </div>
           ))}
         </div>
       )}

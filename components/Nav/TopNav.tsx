@@ -116,6 +116,7 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
               currentVersionId={currentVersionId}
               currentSlug={currentSlug}
               versionSlugs={versionSlugs}
+              isLoggedIn={!!userName}
             />
             {userName ? (
               <div className="flex items-center gap-2 border-l border-gray-700 pl-4">

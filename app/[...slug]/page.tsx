@@ -108,7 +108,7 @@ export default async function DocPage({ params }: Props) {
               {frontmatter.description && (
                 <p className="text-gray-500 text-lg mb-6 leading-relaxed">{frontmatter.description}</p>
               )}
-              <DocActions file={navEntry.file} downloadPdf={frontmatter.download_pdf} />
+              <DocActions file={navEntry.file} downloadPdf={frontmatter.download_pdf} offline={process.env.OFFLINE_MODE === "true"} />
               <ZoomImages />
               <div className="prose prose-gray mt-6">
                 <MDXRemote
