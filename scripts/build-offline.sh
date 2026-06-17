@@ -16,6 +16,40 @@ OUT_DIR="$ROOT/out"
 BUILDS_DIR="$ROOT/offline-builds"
 ZIP_NAME="gw-helpcenter-${VERSION}-offline.zip"
 
+# API routes that require a live server — stash them outside app/ during static export
+SERVER_ROUTES=(
+  "app/api/raw/route.ts"
+  "app/api/download/route.ts"
+  "app/api/search/route.ts"
+  "app/api/auth"
+)
+
+stash_routes() {
+  mkdir -p "$ROOT/.offline-stash"
+  for r in "${SERVER_ROUTES[@]}"; do
+    if [ -e "$ROOT/$r" ]; then
+      # Flatten path for stash filename
+      stash_name="${r//\//__}"
+      mv "$ROOT/$r" "$ROOT/.offline-stash/$stash_name"
+    fi
+  done
+}
+
+restore_routes() {
+  for r in "${SERVER_ROUTES[@]}"; do
+    stash_name="${r//\//__}"
+    if [ -e "$ROOT/.offline-stash/$stash_name" ]; then
+      # Recreate parent dir if needed (e.g. app/api/raw/)
+      mkdir -p "$ROOT/$(dirname "$r")"
+      mv "$ROOT/.offline-stash/$stash_name" "$ROOT/$r"
+    fi
+  done
+  rmdir "$ROOT/.offline-stash" 2>/dev/null || true
+}
+
+# Always restore on exit (even on error)
+trap restore_routes EXIT
+
 echo "▶ Building offline package for version: $VERSION"
 
 # 1. Pre-build the search index (no API server in static export)
@@ -23,7 +57,11 @@ echo "  → Generating search index..."
 cd "$ROOT"
 npx tsx scripts/build-search-index.ts
 
-# 2. Static export
+# 2. Stash server-only routes so next build doesn't complain
+echo "  → Stashing server-only API routes..."
+stash_routes
+
+# 3. Static export
 echo "  → Running next build (OFFLINE_MODE=true, TARGET_VERSION=$VERSION)..."
 OFFLINE_MODE=true TARGET_VERSION="$VERSION" npx next build
 

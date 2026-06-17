@@ -14,7 +14,7 @@ export function Icon({ name, size = 18, className, color }: Props) {
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
     .join("")
 
-  const LucideIcon = (LucideIcons as Record<string, React.ComponentType<{ size?: number; className?: string; color?: string }>>)[pascalName]
+  const LucideIcon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; className?: string; color?: string }>>)[pascalName]
 
   if (!LucideIcon) {
     console.warn(`Icon "${name}" (${pascalName}) not found in lucide-react`)

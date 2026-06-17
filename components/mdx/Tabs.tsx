@@ -13,8 +13,10 @@ export function Tab({ children }: TabProps) {
 
 export function Tabs({ children }: { children: React.ReactNode }) {
   const tabs = Children.toArray(children).filter(
-    (child) => isValidElement(child) && (child.type as { displayName?: string })?.displayName === "Tab" ||
-               isValidElement(child) && (child as React.ReactElement).props?.label !== undefined
+    (child) => isValidElement(child) && (
+      (child.type as { displayName?: string })?.displayName === "Tab" ||
+      (child as React.ReactElement<Record<string, unknown>>).props?.label !== undefined
+    )
   ) as React.ReactElement<TabProps>[]
 
   const [active, setActive] = useState(0)
