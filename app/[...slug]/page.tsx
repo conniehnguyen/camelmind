@@ -98,7 +98,7 @@ export default async function DocPage({ params }: Props) {
         <Sidebar activeGroup={activeGroup} currentSlug={fullSlug} userRoles={session?.roles ?? []} />
         <main className="flex-1 overflow-y-auto">
           <div className="flex max-w-5xl mx-auto">
-            <article className="flex-1 px-10 py-8 min-w-0">
+            <article className="flex-1 px-4 md:px-10 py-6 md:py-8 min-w-0">
               <Breadcrumbs
                 activeGroup={activeGroup}
                 sectionEntry={sectionEntry}

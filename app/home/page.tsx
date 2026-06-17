@@ -76,11 +76,11 @@ export default async function HomePage() {
 
       <main className="flex-1 bg-white">
         {/* Hero */}
-        <section className="bg-gray-950 text-white px-6 py-20 text-center">
+        <section className="bg-gray-950 text-white px-4 md:px-6 py-14 md:py-20 text-center">
           <p className="text-gray-400 text-sm font-semibold uppercase tracking-widest mb-3">Second Front Systems</p>
           <h1 className="text-4xl font-bold mb-4">Game Warden Help Center</h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto mb-8">
-            Everything you need to onboard, deploy, and operate your application on Game Warden platform, the Modern DevSecOps Platform for GovTech.
+            Everything you need to onboard, deploy, and operate your application on Game Warden platform, the modern DevSecOps Platform for GovTech.
           </p>
           <div className="flex justify-center gap-3">
             <Link href="/getting-started/onboarding/quickstart" className="bg-white hover:bg-gray-100 text-gray-900 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
@@ -92,7 +92,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <div className="max-w-5xl mx-auto px-6 py-16 space-y-20">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-10 md:py-16 space-y-16 md:space-y-20">
 
           {/* Feature cards */}
           <section>

@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { Menu } from "lucide-react"
 import { NavEntry, NavGroup, isNavGroup } from "@/lib/nav-types"
 import { VersionSelector } from "./VersionSelector"
+import { MobileDrawer } from "./MobileDrawer"
 import { SearchTrigger } from "@/components/Search/SearchModal"
 import type { Version } from "@/lib/versions"
 
@@ -20,6 +22,7 @@ type Props = {
 
 export function TopNav({ nav, userRoles, userName, versions, currentVersionId, currentSlug, versionSlugs }: Props) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const navRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -41,92 +44,119 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
     roles.length === 0 || roles.some((r) => userRoles.includes(r))
 
   return (
-    <nav ref={navRef} className="bg-gray-900 text-white px-6 py-3 flex items-center gap-6">
-      <Link href="/home" className="flex items-center gap-2 mr-4">
-        <Image src="/2f-logo.png" alt="Second Front" width={28} height={16} unoptimized className="invert" />
-        <span className="font-bold text-lg">Game Warden</span>
-      </Link>
+    <>
+      <nav ref={navRef} className="bg-gray-900 text-white px-4 md:px-6 py-3 flex items-center gap-4 md:gap-6">
+        {/* Logo */}
+        <Link href="/home" className="flex items-center gap-2 mr-0 md:mr-4 shrink-0">
+          <Image src="/2f-logo.png" alt="Second Front" width={28} height={16} unoptimized className="invert" />
+          <span className="font-bold text-lg">Game Warden</span>
+        </Link>
 
-      {nav.map((item) => {
-        if (isNavGroup(item)) {
-          // noDropdown groups, or versioned nav entries with dropdown:false and no items
-          if ((item.noDropdown || !item.items) && item.slug) {
+        {/* Desktop nav items */}
+        <div className="hidden md:flex items-center gap-6 flex-1">
+          {nav.map((item) => {
+            if (isNavGroup(item)) {
+              if ((item.noDropdown || !item.items) && item.slug) {
+                return (
+                  <Link key={item.label} href={item.slug} className="text-sm font-medium hover:text-gray-300">
+                    {item.label}
+                  </Link>
+                )
+              }
+
+              const visibleItems = (item.items ?? []).filter((i) => canSee(i.roles))
+              if (visibleItems.length === 0) return null
+
+              return (
+                <div key={item.label} className="relative">
+                  <button
+                    className="flex items-center gap-1 hover:text-gray-300 text-sm font-medium"
+                    onClick={() => setOpenDropdown(openDropdown === item.label ? null : item.label)}
+                  >
+                    {item.label}
+                    <span className="text-xs">▾</span>
+                  </button>
+
+                  {openDropdown === item.label && (
+                    <div className="absolute top-full left-0 mt-1 w-56 bg-white text-gray-900 rounded shadow-lg z-50 py-1 border border-gray-200">
+                      {visibleItems.map((child) => (
+                        <Link
+                          key={child.slug}
+                          href={child.slug}
+                          className="block px-4 py-2 text-sm hover:bg-gray-100"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            }
+
+            const entry = item as NavEntry
+            if (!canSee(entry.roles)) return null
             return (
-              <Link key={item.label} href={item.slug} className="text-sm font-medium hover:text-gray-300">
-                {item.label}
+              <Link key={entry.slug} href={entry.slug} className="text-sm font-medium hover:text-gray-300">
+                {entry.label}
               </Link>
             )
-          }
+          })}
+        </div>
 
-          const visibleItems = (item.items ?? []).filter((i) => canSee(i.roles))
-          if (visibleItems.length === 0) return null
+        {/* Right side */}
+        <div className="ml-auto flex items-center gap-3">
+          <SearchTrigger />
 
-          return (
-            <div key={item.label} className="relative">
-              <button
-                className="flex items-center gap-1 hover:text-gray-300 text-sm font-medium"
-                onClick={() =>
-                  setOpenDropdown(openDropdown === item.label ? null : item.label)
-                }
-              >
-                {item.label}
-                <span className="text-xs">▾</span>
-              </button>
-
-              {openDropdown === item.label && (
-                <div className="absolute top-full left-0 mt-1 w-56 bg-white text-gray-900 rounded shadow-lg z-50 py-1 border border-gray-200">
-                  {visibleItems.map((child) => (
-                    <Link
-                      key={child.slug}
-                      href={child.slug}
-                      className="block px-4 py-2 text-sm hover:bg-gray-100"
-                      onClick={() => setOpenDropdown(null)}
-                    >
-                      {child.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          )
-        }
-
-        const entry = item as NavEntry
-        if (!canSee(entry.roles)) return null
-        return (
-          <Link key={entry.slug} href={entry.slug} className="text-sm font-medium hover:text-gray-300">
-            {entry.label}
-          </Link>
-        )
-      })}
-
-      <div className="ml-auto flex items-center gap-4">
-        <SearchTrigger />
-        <VersionSelector
-          versions={versions}
-          currentVersionId={currentVersionId}
-          currentSlug={currentSlug}
-          versionSlugs={versionSlugs}
-        />
-        {userName ? (
-          <div className="flex items-center gap-2 border-l border-gray-700 pl-4">
-            <span className="text-xs text-gray-400">{userName}</span>
-            <button
-              onClick={signOut}
-              className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-2 py-1 rounded transition-colors"
-            >
-              Sign out
-            </button>
+          {/* Desktop: version selector + user */}
+          <div className="hidden md:flex items-center gap-4">
+            <VersionSelector
+              versions={versions}
+              currentVersionId={currentVersionId}
+              currentSlug={currentSlug}
+              versionSlugs={versionSlugs}
+            />
+            {userName ? (
+              <div className="flex items-center gap-2 border-l border-gray-700 pl-4">
+                <span className="text-xs text-gray-400">{userName}</span>
+                <button
+                  onClick={signOut}
+                  className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-2 py-1 rounded transition-colors"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <a href="/login" className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-2 py-1 rounded transition-colors ml-2">
+                Sign in
+              </a>
+            )}
           </div>
-        ) : (
-          <a
-            href="/login"
-            className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-2 py-1 rounded transition-colors ml-2"
+
+          {/* Mobile: hamburger */}
+          <button
+            className="md:hidden p-2 text-gray-300 hover:text-white"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open menu"
           >
-            Sign in
-          </a>
-        )}
-      </div>
-    </nav>
+            <Menu size={22} />
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile drawer */}
+      <MobileDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        nav={nav}
+        userRoles={userRoles}
+        userName={userName ?? null}
+        versions={versions}
+        currentVersionId={currentVersionId}
+        currentSlug={currentSlug}
+        versionSlugs={versionSlugs}
+      />
+    </>
   )
 }
