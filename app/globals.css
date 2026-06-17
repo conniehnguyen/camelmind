@@ -266,15 +266,43 @@ body {
     display: none !important;
   }
 
-  /* Full-width article */
-  main {
+  /* Break the h-screen / overflow layout so full content prints.
+     Target Tailwind utility classes directly — they map 1:1 to CSS selectors. */
+  html,
+  body,
+  .h-screen,
+  .h-full {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .overflow-hidden,
+  .overflow-y-auto,
+  .overflow-x-hidden {
     overflow: visible !important;
   }
 
+  /* flex-1 inside a fixed-height container would clip; release it */
+  .flex-1 {
+    flex: none !important;
+    height: auto !important;
+  }
+
+  /* Full-width article */
   article {
     max-width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
+  }
+
+  /* Expand all <details> elements — also handled via JS in generate-pdfs.ts */
+  details,
+  details[open] {
+    display: block !important;
+  }
+  details > :not(summary) {
+    display: block !important;
+    visibility: visible !important;
   }
 
   /* Avoid breaking inside callouts, code blocks, tables */

@@ -75,6 +75,23 @@ async function generatePage(
     await pw.goto(url, { waitUntil: "networkidle", timeout: 30000 })
     await pw.waitForSelector("article", { timeout: 10000 })
 
+    // Force-open all <details> elements so their content is captured
+    // Also release height/overflow constraints that would clip content in print
+    await pw.evaluate(() => {
+      document.querySelectorAll("details").forEach((d) => { d.open = true })
+
+      // Release Tailwind h-screen / overflow-hidden / overflow-y-auto layout
+      // so Playwright's print renderer sees the full document height
+      const style = document.createElement("style")
+      style.textContent = `
+        html, body, .h-screen, .h-full { height: auto !important; min-height: 0 !important; }
+        .overflow-hidden, .overflow-y-auto, .overflow-x-hidden { overflow: visible !important; }
+        .flex-1 { flex: none !important; height: auto !important; }
+        nav, aside, [data-print="hide"] { display: none !important; }
+      `
+      document.head.appendChild(style)
+    })
+
     await pw.pdf({
       path: outFile,
       format: "Letter",
