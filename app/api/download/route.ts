@@ -35,9 +35,9 @@ export async function GET(req: NextRequest) {
   }
 
   const stat = fs.statSync(zipPath)
-  const stream = fs.createReadStream(zipPath)
+  const buffer = fs.readFileSync(zipPath)
 
-  return new NextResponse(stream as unknown as ReadableStream, {
+  return new NextResponse(buffer, {
     headers: {
       "Content-Type": "application/zip",
       "Content-Disposition": `attachment; filename="gw-helpcenter-${versionId}-offline.zip"`,
