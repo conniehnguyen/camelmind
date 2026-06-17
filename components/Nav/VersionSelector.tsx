@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Download } from "lucide-react"
+import { Download, FileText } from "lucide-react"
 import type { Version } from "@/lib/versions"
 
 type Props = {
@@ -79,14 +79,24 @@ export function VersionSelector({ versions, currentVersionId, currentSlug, versi
                 </span>
               </button>
               {isLoggedIn && v.stable && (
-                <a
-                  href={`/api/download?version=${v.id}`}
-                  title={`Download ${v.label} for offline use`}
-                  className="pr-3 pl-1 py-2 text-gray-400 hover:text-gray-700 transition-colors opacity-0 group-hover:opacity-100"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Download size={14} />
-                </a>
+                <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <a
+                    href={`/api/download?version=${v.id}&type=pdf`}
+                    title={`Download ${v.label} as PDF`}
+                    className="px-1.5 py-2 text-gray-400 hover:text-gray-700 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <FileText size={14} />
+                  </a>
+                  <a
+                    href={`/api/download?version=${v.id}`}
+                    title={`Download ${v.label} for offline use`}
+                    className="pr-2 pl-1 py-2 text-gray-400 hover:text-gray-700 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Download size={14} />
+                  </a>
+                </div>
               )}
             </div>
           ))}

@@ -99,16 +99,20 @@ export default async function DocPage({ params }: Props) {
         <main className="flex-1 overflow-y-auto">
           <div className="flex max-w-5xl mx-auto">
             <article className="flex-1 px-4 md:px-10 py-6 md:py-8 min-w-0">
-              <Breadcrumbs
-                activeGroup={activeGroup}
-                sectionEntry={sectionEntry}
-                currentEntry={navEntry as NavEntry}
-              />
+              <div data-print="hide">
+                <Breadcrumbs
+                  activeGroup={activeGroup}
+                  sectionEntry={sectionEntry}
+                  currentEntry={navEntry as NavEntry}
+                />
+              </div>
               <h1 className="text-3xl font-bold mb-2 text-gray-900">{frontmatter.title}</h1>
               {frontmatter.description && (
                 <p className="text-gray-500 text-lg mb-6 leading-relaxed">{frontmatter.description}</p>
               )}
-              <DocActions file={navEntry.file} downloadPdf={frontmatter.download_pdf} offline={process.env.OFFLINE_MODE === "true"} />
+              <div data-print="hide">
+                <DocActions file={navEntry.file} downloadPdf={frontmatter.download_pdf} offline={process.env.OFFLINE_MODE === "true"} />
+              </div>
               <ZoomImages />
               <div className="prose prose-gray mt-6">
                 <MDXRemote
@@ -126,7 +130,9 @@ export default async function DocPage({ params }: Props) {
                 />
               </div>
               {isSectionRoot && sectionEntry && <SectionCards entry={sectionEntry} />}
-              <PageNav activeGroup={activeGroup} currentSlug={fullSlug} />
+              <div data-print="hide">
+                <PageNav activeGroup={activeGroup} currentSlug={fullSlug} />
+              </div>
             </article>
             <Toc entries={toc} />
           </div>

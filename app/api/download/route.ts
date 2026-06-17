@@ -5,13 +5,15 @@ import { getSession } from "@/lib/auth"
 import { loadVersions } from "@/lib/versions"
 
 export async function GET(req: NextRequest) {
-  // Must be logged in — offline packages contain all role-gated content
+  // Must be logged in — packages contain all role-gated content
   const session = await getSession()
   if (!session) {
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
   const versionId = req.nextUrl.searchParams.get("version")
+  const type = req.nextUrl.searchParams.get("type") ?? "zip" // "zip" | "pdf"
+
   if (!versionId) {
     return new NextResponse("Missing version parameter", { status: 400 })
   }
@@ -23,20 +25,34 @@ export async function GET(req: NextRequest) {
     return new NextResponse("Unknown version", { status: 404 })
   }
 
-  // Only stable versions are available for offline download
+  // Only stable versions are available for download
   if (!version.stable) {
-    return new NextResponse("Offline download not available for pre-release versions", { status: 403 })
+    return new NextResponse("Download not available for pre-release versions", { status: 403 })
   }
 
-  const zipPath = path.join(process.cwd(), "offline-builds", `gw-helpcenter-${versionId}-offline.zip`)
+  if (type === "pdf") {
+    const pdfPath = path.join(process.cwd(), "offline-builds", `Game-Warden-Help-Center-${versionId}.pdf`)
+    if (!fs.existsSync(pdfPath)) {
+      return new NextResponse("PDF not yet built for this version", { status: 404 })
+    }
+    const stat = fs.statSync(pdfPath)
+    const buffer = fs.readFileSync(pdfPath)
+    return new NextResponse(buffer, {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="Game-Warden-Help-Center-${versionId}.pdf"`,
+        "Content-Length": stat.size.toString(),
+      },
+    })
+  }
 
+  // Default: ZIP
+  const zipPath = path.join(process.cwd(), "offline-builds", `gw-helpcenter-${versionId}-offline.zip`)
   if (!fs.existsSync(zipPath)) {
     return new NextResponse("Offline package not yet built for this version", { status: 404 })
   }
-
   const stat = fs.statSync(zipPath)
   const buffer = fs.readFileSync(zipPath)
-
   return new NextResponse(buffer, {
     headers: {
       "Content-Type": "application/zip",
