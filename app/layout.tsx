@@ -5,6 +5,9 @@ import { SearchModal } from "@/components/Search/SearchModal"
 export const metadata: Metadata = {
   title: "Game Warden Help Center",
   description: "Game Warden documentation",
+  icons: {
+    icon: "/2f-logo.png",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
