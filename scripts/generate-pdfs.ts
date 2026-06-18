@@ -75,18 +75,20 @@ async function generatePage(
     await pw.goto(url, { waitUntil: "networkidle", timeout: 30000 })
     await pw.waitForSelector("article", { timeout: 10000 })
 
-    // Prepare DOM for PDF capture:
-    //   - force-open <details>, expand layout, hide chrome elements
-    await pw.evaluate(() => {
+    // Wait for React hydration to fully settle
+    await pw.waitForTimeout(800)
+
+    // Manipulate DOM, then take a frozen static snapshot before React can
+    // reconcile the changes back. Strip all <script> tags so the snapshot
+    // page has no JS runtime that could re-insert elements.
+    const frozenHtml = await pw.evaluate((baseUrl) => {
       // Open all collapsible sections
-      document.querySelectorAll("details").forEach((d) => { d.open = true })
+      document.querySelectorAll("details").forEach((d) => { (d as HTMLDetailsElement).open = true })
 
-      // Directly hide all print-excluded elements (don't rely on @media print)
-      document.querySelectorAll<HTMLElement>(
-        'nav, aside, [data-print="hide"], .print\\:hidden'
-      ).forEach((el) => { el.style.setProperty("display", "none", "important") })
+      // Remove chrome elements
+      document.querySelectorAll('nav, aside, [data-print="hide"]').forEach((el) => el.remove())
 
-      // Release Tailwind h-screen / overflow layout so full content renders
+      // Release layout constraints
       const style = document.createElement("style")
       style.textContent = `
         html, body, .h-screen, .h-full { height: auto !important; min-height: 0 !important; }
@@ -94,9 +96,24 @@ async function generatePage(
         .flex-1 { flex: none !important; height: auto !important; }
       `
       document.head.appendChild(style)
-    })
 
-    await pw.pdf({
+      // Resolve all relative CSS hrefs to absolute so they load from the
+      // static server when we setContent on the snapshot page
+      document.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet']").forEach((l) => {
+        if (l.href && !l.href.startsWith("http")) l.href = baseUrl + l.href
+      })
+
+      // Strip all scripts — the snapshot must be static (no React runtime)
+      document.querySelectorAll("script").forEach((s) => s.remove())
+
+      return document.documentElement.outerHTML
+    }, BASE_URL)
+
+    // Load the frozen snapshot into a fresh page and generate the PDF from it
+    const snapPage = await ctx.newPage()
+    await snapPage.setContent(frozenHtml, { waitUntil: "load" })
+
+    await snapPage.pdf({
       path: outFile,
       format: "Letter",
       printBackground: true,
@@ -114,6 +131,7 @@ async function generatePage(
         </div>`,
     })
 
+    await snapPage.close()
     return { page, file: outFile }
   } catch (e) {
     console.warn(`  ⚠ Failed: ${url} — ${(e as Error).message}`)
