@@ -109,9 +109,8 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
         {/* Right side */}
         <div className="ml-auto flex items-center gap-3">
           <SearchTrigger />
-          <ThemeToggle />
 
-          {/* Desktop: version selector + user */}
+          {/* Desktop: version selector + user + theme toggle */}
           <div className="hidden md:flex items-center gap-4">
             <VersionSelector
               versions={versions}
@@ -135,16 +134,20 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
                 Sign in
               </a>
             )}
+            <ThemeToggle />
           </div>
 
-          {/* Mobile: hamburger */}
-          <button
-            className="md:hidden p-2 text-gray-300 hover:text-white"
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu size={22} />
-          </button>
+          {/* Mobile: theme toggle + hamburger */}
+          <div className="md:hidden flex items-center gap-1">
+            <ThemeToggle />
+            <button
+              className="p-2 text-gray-300 hover:text-white"
+              onClick={() => setDrawerOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu size={22} />
+            </button>
+          </div>
         </div>
       </nav>
 
