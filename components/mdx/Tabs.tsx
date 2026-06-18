@@ -49,8 +49,8 @@ export function Tabs({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* PDF: all panels expanded — hidden on screen, shown by data-print="show" in generator */}
-      <div data-print="show" style={{ display: "none" }}>
+      {/* PDF: all panels expanded — hidden on screen via class, shown by removing it in generator */}
+      <div data-print="show" className="hidden">
         {tabs.map((tab, i) => (
           <div key={i} className="mb-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2 pb-1 border-b border-gray-200">

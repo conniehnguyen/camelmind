@@ -80,10 +80,9 @@ async function generatePage(
     await pw.evaluate(() => {
       document.querySelectorAll("details").forEach((d) => { d.open = true })
 
-      // Show print-only elements by removing their inline display:none
-      // (can't override inline styles reliably via injected CSS)
+      // Show print-only elements by removing the Tailwind 'hidden' class
       document.querySelectorAll<HTMLElement>('[data-print="show"]').forEach((el) => {
-        el.style.removeProperty("display")
+        el.classList.remove("hidden")
       })
 
       // Release Tailwind h-screen / overflow-hidden / overflow-y-auto layout
