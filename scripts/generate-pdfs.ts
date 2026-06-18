@@ -88,6 +88,7 @@ async function generatePage(
         .overflow-hidden, .overflow-y-auto, .overflow-x-hidden { overflow: visible !important; }
         .flex-1 { flex: none !important; height: auto !important; }
         nav, aside, [data-print="hide"] { display: none !important; }
+        [data-print="show"] { display: block !important; }
       `
       document.head.appendChild(style)
     })

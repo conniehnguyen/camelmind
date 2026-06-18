@@ -25,8 +25,8 @@ export function Tabs({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="my-4 not-prose">
-      {/* Screen: tabbed UI */}
-      <div className="rounded-lg border border-gray-200 overflow-hidden print:hidden">
+      {/* Screen: tabbed UI — hidden in PDF via data-print="hide" */}
+      <div data-print="hide" className="rounded-lg border border-gray-200 overflow-hidden">
         {/* Tab bar */}
         <div className="flex border-b border-gray-200 bg-gray-50">
           {tabs.map((tab, i) => (
@@ -49,8 +49,8 @@ export function Tabs({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Print: all panels expanded, each with a label heading */}
-      <div className="hidden print:block">
+      {/* PDF: all panels expanded — hidden on screen, shown by data-print="show" in generator */}
+      <div data-print="show" style={{ display: "none" }}>
         {tabs.map((tab, i) => (
           <div key={i} className="mb-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2 pb-1 border-b border-gray-200">
