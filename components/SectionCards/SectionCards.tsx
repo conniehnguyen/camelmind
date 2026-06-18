@@ -12,7 +12,7 @@ export function SectionCards({ entry }: { entry: NavEntry }) {
         <Link
           key={child.slug}
           href={child.slug}
-          className="group flex flex-col gap-1 p-4 rounded-lg border border-gray-200 hover:border-gray-400 hover:bg-gray-50 transition-all"
+          className="group flex flex-col gap-1 p-4 rounded-lg hover:bg-gray-50 transition-all"
         >
           <span className="text-sm font-semibold text-gray-800 group-hover:text-gray-900 transition-colors">
             {child.label}
@@ -22,7 +22,7 @@ export function SectionCards({ entry }: { entry: NavEntry }) {
               {child.children.length} article{child.children.length !== 1 ? "s" : ""}
             </span>
           )}
-          <span className="text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="text-xs text-gray-400 mt-1">
             View →
           </span>
         </Link>
