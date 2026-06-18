@@ -29,10 +29,10 @@ export function Toc({ entries }: { entries: TocEntry[] }) {
 
   return (
     <aside className="hidden xl:block w-56 shrink-0 pl-6 py-8 self-start sticky top-8">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
         On this page
       </p>
-      <ul className="border-l border-gray-200">
+      <ul className="border-l border-gray-200 dark:border-gray-700">
         {entries.map((entry) => (
           <li key={entry.id}>
             <a
@@ -44,7 +44,7 @@ export function Toc({ entries }: { entries: TocEntry[] }) {
               } ${
                 activeId === entry.id
                   ? "font-semibold"
-                  : "border-transparent text-gray-400 hover:text-gray-700"
+                  : "border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
             >
               {entry.text}

@@ -1,10 +1,18 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Tailwind v4 dark mode — toggled by .dark class on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ── Second Front brand tokens ── */
 :root {
   --sf-active: #111827;        /* active sidebar item + ToC heading */
   --sf-active-border: #111827; /* active left border */
+}
+
+.dark {
+  --sf-active: #f9fafb;
+  --sf-active-border: #f9fafb;
 }
 
 /* ── Callout / Admonition styles from Second Front brand ── */
@@ -254,6 +262,95 @@ body {
   position: relative;
 }
 
+
+/* ── Dark mode overrides ── */
+
+.dark .callout {
+  background-color: #1e2027;
+  border-color: #374151;
+}
+
+.dark .callout-header {
+  color: #f3f4f6;
+}
+
+.dark .callout-body {
+  color: #d1d5db;
+}
+
+.dark .callout.note  { border-color: #3b5ea6; }
+.dark .callout.note  .callout-header { background-color: #1e3a5f; }
+
+.dark .callout.tip   { border-color: #3b4ea6; }
+.dark .callout.tip   .callout-header { background-color: #1e2f6b; }
+
+.dark .callout.warning { border-color: #7c5a2a; }
+.dark .callout.warning .callout-header { background-color: #4a3010; }
+
+.dark .callout.important { border-color: #1a7a70; }
+.dark .callout.important .callout-header { background-color: #0d3d39; }
+
+.dark .callout.danger  { border-color: #7c2a2a; }
+.dark .callout.danger  .callout-header { background-color: #4a1010; }
+
+.dark .callout.success { border-color: #2a6b2a; }
+.dark .callout.success .callout-header { background-color: #103a10; }
+
+/* Dark prose — tables, code, headings */
+.dark .prose {
+  color: #d1d5db;
+}
+
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4 {
+  color: #f3f4f6;
+}
+
+.dark .prose strong {
+  color: #f3f4f6;
+}
+
+.dark .prose a {
+  color: #93c5fd;
+}
+
+.dark .prose thead th {
+  background-color: #1f2937;
+  border-bottom-color: #374151;
+  color: #d1d5db;
+}
+
+.dark .prose tbody tr:nth-child(even) td {
+  background-color: #1a1f2e;
+}
+
+.dark .prose tbody tr:nth-child(odd) td {
+  background-color: #111827;
+}
+
+.dark .prose code {
+  background-color: #1f2937;
+  color: #e5e7eb;
+}
+
+/* Dark timeline */
+.dark .timeline-item::before {
+  background-color: #4b5563;
+}
+
+.dark .timeline-step-anchor {
+  background-color: #4b5563;
+}
+
+.dark .timeline-step-anchor:hover {
+  background-color: #6b7280;
+}
+
+.dark .timeline-item:not(.last-item)::after {
+  border-left-color: #374151;
+}
 
 /* ── Print / PDF styles ── */
 @media print {

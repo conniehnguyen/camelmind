@@ -24,8 +24,8 @@ function DocLink({ item, currentSlug }: { item: NavChild; currentSlug: string })
         style={isActive ? { borderColor: "var(--sf-active-border)", color: "var(--sf-active)" } : {}}
         className={`block py-1.5 pl-4 pr-3 text-sm border-l-2 transition-colors ${
           isActive
-            ? "font-medium bg-black/5"
-            : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+            ? "font-medium bg-black/5 dark:bg-white/10"
+            : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600"
         }`}
       >
         {item.label}
@@ -63,8 +63,8 @@ function SectionRow({
           style={currentSlug === section.slug ? { borderColor: "var(--sf-active-border)", color: "var(--sf-active)" } : {}}
         className={`block py-1.5 pl-4 pr-2 text-sm border-l-2 transition-colors ${
             currentSlug === section.slug
-              ? "font-medium bg-black/5"
-              : "border-transparent text-gray-700 hover:text-gray-900 hover:border-gray-300"
+              ? "font-medium bg-black/5 dark:bg-white/10"
+              : "border-transparent text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600"
           }`}
         >
           {section.label}
@@ -78,7 +78,7 @@ function SectionRow({
       {/* Section header — full-width click area toggles collapse */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between py-1.5 px-2 text-sm text-gray-700 hover:text-gray-900 transition-colors rounded"
+        className="w-full flex items-center justify-between py-1.5 px-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors rounded"
       >
         <span>{section.label}</span>
         <svg
@@ -123,7 +123,7 @@ function CategoryBlock({
         href={entry.slug}
         style={isCategoryActive ? { color: "var(--sf-active)" } : {}}
         className={`block px-2 pb-1 text-xs font-semibold uppercase tracking-widest transition-colors select-none ${
-          isCategoryActive ? "" : "text-gray-400 hover:text-gray-600"
+          isCategoryActive ? "" : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
         }`}
       >
         {entry.label}
@@ -153,7 +153,7 @@ function GroupSidebar({
   const visibleItems = group.items.filter((i) => canSee(i.roles, userRoles))
 
   return (
-    <aside className="hidden md:block w-72 shrink-0 border-r border-gray-200 overflow-y-auto">
+    <aside className="hidden md:block w-72 shrink-0 border-r border-gray-200 dark:border-gray-800 overflow-y-auto bg-white dark:bg-gray-950">
       <div className="px-4 py-4">
         {visibleItems.map((entry) => (
           <CategoryBlock
@@ -180,6 +180,6 @@ export function Sidebar({ activeGroup, currentSlug, userRoles }: Props) {
   }
 
   return (
-    <aside className="hidden md:block w-72 shrink-0 border-r border-gray-200 p-4 overflow-y-auto" />
+    <aside className="hidden md:block w-72 shrink-0 border-r border-gray-200 dark:border-gray-800 p-4 overflow-y-auto bg-white dark:bg-gray-950" />
   )
 }

@@ -8,6 +8,7 @@ import { NavEntry, NavGroup, isNavGroup } from "@/lib/nav-types"
 import { VersionSelector } from "./VersionSelector"
 import { MobileDrawer } from "./MobileDrawer"
 import { SearchTrigger } from "@/components/Search/SearchModal"
+import { ThemeToggle } from "./ThemeToggle"
 import type { Version } from "@/lib/versions"
 
 type Props = {
@@ -78,12 +79,12 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
                   </button>
 
                   {openDropdown === item.label && (
-                    <div className="absolute top-full left-0 mt-1 w-56 bg-white text-gray-900 rounded shadow-lg z-50 py-1 border border-gray-200">
+                    <div className="absolute top-full left-0 mt-1 w-56 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded shadow-lg z-50 py-1 border border-gray-200 dark:border-gray-700">
                       {visibleItems.map((child) => (
                         <Link
                           key={child.slug}
                           href={child.slug}
-                          className="block px-4 py-2 text-sm hover:bg-gray-100"
+                          className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                           onClick={() => setOpenDropdown(null)}
                         >
                           {child.label}
@@ -108,6 +109,7 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
         {/* Right side */}
         <div className="ml-auto flex items-center gap-3">
           <SearchTrigger />
+          <ThemeToggle />
 
           {/* Desktop: version selector + user */}
           <div className="hidden md:flex items-center gap-4">
