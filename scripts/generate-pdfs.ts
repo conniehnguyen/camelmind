@@ -75,19 +75,23 @@ async function generatePage(
     await pw.goto(url, { waitUntil: "networkidle", timeout: 30000 })
     await pw.waitForSelector("article", { timeout: 10000 })
 
-    // Force-open all <details> elements so their content is captured
-    // Also release height/overflow constraints that would clip content in print
+    // Prepare DOM for PDF capture:
+    //   - force-open <details>, expand layout, hide chrome elements
     await pw.evaluate(() => {
+      // Open all collapsible sections
       document.querySelectorAll("details").forEach((d) => { d.open = true })
 
-      // Release Tailwind h-screen / overflow-hidden / overflow-y-auto layout
-      // so Playwright's print renderer sees the full document height
+      // Directly hide all print-excluded elements (don't rely on @media print)
+      document.querySelectorAll<HTMLElement>(
+        'nav, aside, [data-print="hide"], .print\\:hidden'
+      ).forEach((el) => { el.style.setProperty("display", "none", "important") })
+
+      // Release Tailwind h-screen / overflow layout so full content renders
       const style = document.createElement("style")
       style.textContent = `
         html, body, .h-screen, .h-full { height: auto !important; min-height: 0 !important; }
         .overflow-hidden, .overflow-y-auto, .overflow-x-hidden { overflow: visible !important; }
         .flex-1 { flex: none !important; height: auto !important; }
-        nav, aside, [data-print="hide"] { display: none !important; }
       `
       document.head.appendChild(style)
     })
