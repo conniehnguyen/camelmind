@@ -96,7 +96,7 @@ export default async function DocPage({ params }: Props) {
       <TopNav nav={nav.nav} userRoles={session?.roles ?? []} userName={session?.name ?? null} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar activeGroup={activeGroup} currentSlug={fullSlug} userRoles={session?.roles ?? []} />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-white dark:bg-gray-950">
           <div className="flex max-w-5xl mx-auto">
             <article className="flex-1 px-4 md:px-10 py-6 md:py-8 min-w-0">
               <div data-print="hide">
@@ -106,9 +106,9 @@ export default async function DocPage({ params }: Props) {
                   currentEntry={navEntry as NavEntry}
                 />
               </div>
-              <h1 className="text-3xl font-bold mb-2 text-gray-900">{frontmatter.title}</h1>
+              <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-50">{frontmatter.title}</h1>
               {frontmatter.description && (
-                <p className="text-gray-500 text-lg mb-6 leading-relaxed">{frontmatter.description}</p>
+                <p className="text-gray-500 dark:text-gray-400 text-lg mb-6 leading-relaxed">{frontmatter.description}</p>
               )}
               <div data-print="hide">
                 <DocActions file={navEntry.file} downloadPdf={frontmatter.download_pdf} offline={process.env.OFFLINE_MODE === "true"} />

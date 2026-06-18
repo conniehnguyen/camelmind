@@ -39,14 +39,14 @@ export function PageNav({ activeGroup, currentSlug }: Props) {
   if (!prev && !next) return null
 
   return (
-    <div className="flex justify-between items-center mt-12 pt-6 border-t border-gray-200">
+    <div className="flex justify-between items-center mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
       {prev ? (
         <Link
           href={prev.slug}
           className="flex flex-col items-start group max-w-[45%]"
         >
-          <span className="text-xs text-gray-400 mb-1 group-hover:text-gray-600">← Previous</span>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
+          <span className="text-xs text-gray-400 dark:text-gray-500 mb-1 group-hover:text-gray-600 dark:group-hover:text-gray-300">← Previous</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors">
             {prev.label}
           </span>
         </Link>
@@ -57,8 +57,8 @@ export function PageNav({ activeGroup, currentSlug }: Props) {
           href={next.slug}
           className="flex flex-col items-end group max-w-[45%]"
         >
-          <span className="text-xs text-gray-400 mb-1 group-hover:text-gray-600">Next →</span>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
+          <span className="text-xs text-gray-400 dark:text-gray-500 mb-1 group-hover:text-gray-600 dark:group-hover:text-gray-300">Next →</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors">
             {next.label}
           </span>
         </Link>
