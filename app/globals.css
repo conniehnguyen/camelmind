@@ -335,6 +335,11 @@ body {
   color: #e5e7eb;
 }
 
+.dark .prose pre code {
+  background: none;
+  color: #e2e8f0;
+}
+
 /* Dark timeline */
 .dark .timeline-item::before {
   background-color: #4b5563;
