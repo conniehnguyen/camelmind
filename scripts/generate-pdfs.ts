@@ -106,7 +106,7 @@ async function generatePage(
       footerTemplate: `
         <div style="width:100%;font-family:system-ui,sans-serif;font-size:8px;color:#6b7280;display:flex;justify-content:space-between;padding:0 16mm;">
           <span>${page.title}</span>
-          <span>Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>
+          <span></span>
         </div>`,
     })
 
