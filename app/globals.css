@@ -316,6 +316,15 @@ body {
   color: #93c5fd;
 }
 
+.dark .prose h1 a,
+.dark .prose h2 a,
+.dark .prose h3 a,
+.dark .prose h4 a,
+.dark .prose h5 a,
+.dark .prose h6 a {
+  color: inherit;
+}
+
 .dark .prose thead th {
   background-color: #1f2937;
   border-bottom-color: #374151;
