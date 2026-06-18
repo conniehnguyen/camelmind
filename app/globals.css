@@ -330,13 +330,13 @@ body {
   background-color: #111827;
 }
 
-.dark .prose code {
+.dark .prose code:not(pre code) {
   background-color: #1f2937;
   color: #e5e7eb;
 }
 
 .dark .prose pre code {
-  background: none;
+  background: none !important;
   color: #e2e8f0;
 }
 
