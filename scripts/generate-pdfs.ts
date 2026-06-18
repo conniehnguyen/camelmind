@@ -1,14 +1,15 @@
 /**
  * Generates one PDF per doc page using Playwright headless print.
- * Pages are captured from the running static server (port 8765).
+ * Pages are captured from the live Next.js dev server (port 3000).
  *
  * Usage:
- *   npx tsx scripts/generate-pdfs.ts [--port 8765] [--out .pdf-pages]
+ *   npx tsx scripts/generate-pdfs.ts [--port 3000] [--out .pdf-pages]
  *
  * Outputs: .pdf-pages/<slug-flattened>.pdf  (temp dir, consumed by generate-master-pdf.ts)
  */
 
 import { chromium } from "playwright"
+import { SignJWT } from "jose"
 import fs from "fs"
 import path from "path"
 import yaml from "js-yaml"
@@ -16,7 +17,7 @@ import yaml from "js-yaml"
 const ROOT = path.resolve(process.cwd())
 const NAV_FILE = path.join(ROOT, "nav", "nav.yml")
 
-const PORT = parseInt(process.argv.find((a) => a.startsWith("--port="))?.split("=")[1] ?? "8765")
+const PORT = parseInt(process.argv.find((a) => a.startsWith("--port="))?.split("=")[1] ?? "3000")
 const OUT_DIR = process.argv.find((a) => a.startsWith("--out="))?.split("=")[1]
   ? path.resolve(process.argv.find((a) => a.startsWith("--out="))!.split("=")[1])
   : path.join(ROOT, ".pdf-pages")
@@ -60,15 +61,19 @@ function slugToFilename(slug: string): string {
   return slug.replace(/^\//, "").replace(/\//g, "__") + ".pdf"
 }
 
+type Cookie = Awaited<ReturnType<import("playwright").BrowserContext["cookies"]>>[number]
+
 async function generatePage(
   browser: import("playwright").Browser,
   page: PageEntry,
-  outDir: string
+  outDir: string,
+  cookies: Cookie[]
 ): Promise<{ page: PageEntry; file: string } | null> {
-  const url = `${BASE_URL}${page.slug}/`
+  const url = `${BASE_URL}${page.slug}`
   const outFile = path.join(outDir, slugToFilename(page.slug))
 
   const ctx = await browser.newContext()
+  await ctx.addCookies(cookies)
   const pw = await ctx.newPage()
 
   try {
@@ -134,20 +139,32 @@ async function main() {
 
   // Check server is up
   try {
-    const res = await fetch(`${BASE_URL}/home/`)
+    const res = await fetch(`${BASE_URL}/home`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
   } catch {
-    console.error(`✗ Server not reachable at ${BASE_URL}. Start it first with: npx serve out/ -p ${PORT}`)
+    console.error(`✗ Dev server not reachable at ${BASE_URL}. Run: npm run dev`)
     process.exit(1)
   }
 
   const browser = await chromium.launch()
+
+  // Sign in via the dev login UI so we get a real session cookie
+  const authCtx = await browser.newContext()
+  const authPage = await authCtx.newPage()
+  await authPage.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" })
+  // Click "Staff (vendor + admin)" persona button
+  await authPage.click("button:has-text('Staff')")
+  await authPage.waitForURL(/\/home|\/getting-started/, { timeout: 10000 })
+  const cookies = await authCtx.cookies()
+  await authPage.close()
+  await authCtx.close()
+
   const results: Array<{ page: PageEntry; file: string }> = []
 
   // Process in batches of CONCURRENCY
   for (let i = 0; i < pages.length; i += CONCURRENCY) {
     const batch = pages.slice(i, i + CONCURRENCY)
-    const done = await Promise.all(batch.map((p) => generatePage(browser, p, OUT_DIR)))
+    const done = await Promise.all(batch.map((p) => generatePage(browser, p, OUT_DIR, cookies)))
     for (const r of done) {
       if (r) {
         results.push(r)
