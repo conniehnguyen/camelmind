@@ -305,11 +305,12 @@ body {
     visibility: visible !important;
   }
 
-  /* Avoid breaking inside callouts, code blocks, tables */
+  /* Avoid breaking inside callouts, code blocks, tables, timeline steps */
   .callout,
   pre,
   table,
-  figure {
+  figure,
+  .timeline-item {
     break-inside: avoid;
     page-break-inside: avoid;
   }
