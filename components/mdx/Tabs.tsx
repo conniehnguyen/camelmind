@@ -24,27 +24,43 @@ export function Tabs({ children }: { children: React.ReactNode }) {
   if (tabs.length === 0) return null
 
   return (
-    <div className="my-4 rounded-lg border border-gray-200 overflow-hidden not-prose">
-      {/* Tab bar */}
-      <div className="flex border-b border-gray-200 bg-gray-50">
-        {tabs.map((tab, i) => (
-          <button
-            key={i}
-            onClick={() => setActive(i)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-              i === active
-                ? "border-gray-900 text-gray-900 bg-white"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-            }`}
-          >
-            {tab.props.label}
-          </button>
-        ))}
+    <div className="my-4 not-prose">
+      {/* Screen: tabbed UI */}
+      <div className="rounded-lg border border-gray-200 overflow-hidden print:hidden">
+        {/* Tab bar */}
+        <div className="flex border-b border-gray-200 bg-gray-50">
+          {tabs.map((tab, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                i === active
+                  ? "border-gray-900 text-gray-900 bg-white"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              {tab.props.label}
+            </button>
+          ))}
+        </div>
+        {/* Active tab content */}
+        <div className="p-4 prose prose-gray max-w-none">
+          {tabs[active]?.props.children}
+        </div>
       </div>
 
-      {/* Active tab content */}
-      <div className="p-4 prose prose-gray max-w-none">
-        {tabs[active]?.props.children}
+      {/* Print: all panels expanded, each with a label heading */}
+      <div className="hidden print:block">
+        {tabs.map((tab, i) => (
+          <div key={i} className="mb-4">
+            <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2 pb-1 border-b border-gray-200">
+              {tab.props.label}
+            </div>
+            <div className="prose prose-gray max-w-none">
+              {tab.props.children}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

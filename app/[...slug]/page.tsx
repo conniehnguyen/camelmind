@@ -129,7 +129,11 @@ export default async function DocPage({ params }: Props) {
                   }}
                 />
               </div>
-              {isSectionRoot && sectionEntry && <SectionCards entry={sectionEntry} />}
+              {isSectionRoot && sectionEntry && (
+                <div data-print="hide">
+                  <SectionCards entry={sectionEntry} />
+                </div>
+              )}
               <div data-print="hide">
                 <PageNav activeGroup={activeGroup} currentSlug={fullSlug} />
               </div>
