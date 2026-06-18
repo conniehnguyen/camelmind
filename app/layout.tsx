@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Game Warden Help Center",
   description: "Game Warden documentation",
   icons: {
-    icon: "/2f-logo.png",
+    icon: "/favicon.png",
   },
 }
 
