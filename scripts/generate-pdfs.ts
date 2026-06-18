@@ -80,15 +80,19 @@ async function generatePage(
     await pw.evaluate(() => {
       document.querySelectorAll("details").forEach((d) => { d.open = true })
 
+      // Show print-only elements by removing their inline display:none
+      // (can't override inline styles reliably via injected CSS)
+      document.querySelectorAll<HTMLElement>('[data-print="show"]').forEach((el) => {
+        el.style.removeProperty("display")
+      })
+
       // Release Tailwind h-screen / overflow-hidden / overflow-y-auto layout
-      // so Playwright's print renderer sees the full document height
       const style = document.createElement("style")
       style.textContent = `
         html, body, .h-screen, .h-full { height: auto !important; min-height: 0 !important; }
         .overflow-hidden, .overflow-y-auto, .overflow-x-hidden { overflow: visible !important; }
         .flex-1 { flex: none !important; height: auto !important; }
         nav, aside, [data-print="hide"] { display: none !important; }
-        [data-print="show"] { display: block !important; }
       `
       document.head.appendChild(style)
     })
