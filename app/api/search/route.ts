@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { loadNav, getAllSlugs, getNavEntryBySlug, getSectionForSlug } from "@/lib/nav"
 import { loadMdxFile } from "@/lib/mdx"
+import { getSession, hasAccess } from "@/lib/auth"
 import type { NavGroup } from "@/lib/nav-types"
 
 type SearchIndex = {
@@ -75,21 +76,28 @@ function buildIndex(): SearchIndex[] {
 }
 
 export async function GET(req: NextRequest) {
+  const session = await getSession()
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const q = req.nextUrl.searchParams.get("q")?.toLowerCase().trim() ?? ""
   const filterGroup = req.nextUrl.searchParams.get("group") ?? ""
   const filterRole = req.nextUrl.searchParams.get("role") ?? ""
 
   const index = buildIndex()
+  // Only show docs the current user's roles can access
+  const accessible = index.filter((doc) => hasAccess(doc.roles, session.roles))
 
   // Return all groups for filter chips when no query
   if (!q) {
-    const groups = [...new Set(index.map((d) => d.group).filter(Boolean))]
+    const groups = [...new Set(accessible.map((d) => d.group).filter(Boolean))]
     return NextResponse.json({ results: [], groups })
   }
 
   const terms = q.split(/\s+/).filter(Boolean)
 
-  const scored = index
+  const scored = accessible
     .filter((doc) => {
       if (filterGroup && doc.group !== filterGroup) return false
       if (filterRole && !doc.roles.includes(filterRole) && doc.roles.length > 0) return false
@@ -122,6 +130,6 @@ export async function GET(req: NextRequest) {
     .slice(0, 10)
     .map(({ body: _body, score: _score, ...rest }) => rest)
 
-  const groups = [...new Set(index.map((d) => d.group).filter(Boolean))]
+  const groups = [...new Set(accessible.map((d) => d.group).filter(Boolean))]
   return NextResponse.json({ results: scored, groups })
 }

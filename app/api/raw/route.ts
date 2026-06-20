@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import fs from "fs"
 import path from "path"
+import { getSession } from "@/lib/auth"
 
 export async function GET(req: NextRequest) {
+  const session = await getSession()
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 })
+  }
+
   const file = req.nextUrl.searchParams.get("file")
   const download = req.nextUrl.searchParams.get("download") === "1"
 

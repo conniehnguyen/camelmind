@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from "next/server"
 import { jwtVerify } from "jose"
 
 const COOKIE_NAME = "gw_session"
-const SECRET = new TextEncoder().encode(
-  process.env.SESSION_SECRET ?? "fallback-dev-secret-change-in-prod"
-)
+
+if (!process.env.SESSION_SECRET) {
+  throw new Error("SESSION_SECRET environment variable is not set")
+}
+
+const SECRET = new TextEncoder().encode(process.env.SESSION_SECRET)
 
 // Pages that are always public (no auth required regardless of nav roles)
 // Actual per-page role enforcement still happens in page.tsx

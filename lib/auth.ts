@@ -8,8 +8,13 @@ export type SessionUser = {
 }
 
 const COOKIE_NAME = "gw_session"
+
+if (!process.env.SESSION_SECRET && process.env.OFFLINE_MODE !== "true") {
+  throw new Error("SESSION_SECRET environment variable is not set")
+}
+
 const SECRET = new TextEncoder().encode(
-  process.env.SESSION_SECRET ?? "fallback-dev-secret-change-in-prod"
+  process.env.SESSION_SECRET ?? "offline-mode-placeholder"
 )
 
 export async function createSession(user: SessionUser): Promise<string> {

@@ -12,7 +12,11 @@ export async function GET(req: NextRequest) {
   }
 
   const versionId = req.nextUrl.searchParams.get("version")
-  const type = req.nextUrl.searchParams.get("type") ?? "zip" // "zip" | "pdf"
+  const rawType = req.nextUrl.searchParams.get("type") ?? "zip"
+  if (rawType !== "zip" && rawType !== "pdf") {
+    return new NextResponse("Invalid type parameter", { status: 400 })
+  }
+  const type = rawType
 
   if (!versionId) {
     return new NextResponse("Missing version parameter", { status: 400 })

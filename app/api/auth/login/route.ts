@@ -28,7 +28,9 @@ export async function POST(req: NextRequest) {
   }
 
   const token = await createSession(user)
-  const redirect = returnTo && returnTo.startsWith("/") ? returnTo : "/home"
+  // Strip protocol-relative URLs (//attacker.com) before the startsWith check
+  const sanitized = typeof returnTo === "string" ? returnTo.replace(/^\/\/+/, "/") : ""
+  const redirect = sanitized.startsWith("/") ? sanitized : "/home"
 
   const res = NextResponse.json({ ok: true, redirectTo: redirect })
   res.cookies.set(COOKIE_NAME, token, {
