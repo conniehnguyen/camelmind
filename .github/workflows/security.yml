@@ -1,0 +1,35 @@
+name: Security scan
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # daily at 8am UTC
+  push:
+    branches: [main]
+    paths:
+      - package.json
+      - package-lock.json
+
+jobs:
+  dependency-audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=high
+
+  socket-scan:
+    name: Socket supply chain scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npx --yes socket check
+        continue-on-error: true   # advisory only — review before enforcing
