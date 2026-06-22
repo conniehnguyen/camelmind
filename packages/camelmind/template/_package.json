@@ -1,19 +1,12 @@
 {
-  "name": "@camelmind/docs",
+  "name": "{{projectName}}",
   "version": "0.1.0",
-  "description": "CamelMind documentation site (monorepo root)",
-  "license": "MIT",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "sync-template": "node packages/camelmind/scripts/sync-template.mjs",
-    "build:cli": "npm run build --workspace=packages/camelmind"
+    "lint": "eslint"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.20",

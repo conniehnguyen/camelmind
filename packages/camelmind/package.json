@@ -1,0 +1,48 @@
+{
+  "name": "camelmind",
+  "version": "0.1.0",
+  "description": "Create and manage CamelMind documentation sites",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "camelmind": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "template"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "fs-extra": "^11.2.0",
+    "ora": "^8.1.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20",
+    "@types/prompts": "^2.4.9",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "documentation",
+    "docs",
+    "mdx",
+    "nextjs",
+    "camelmind"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/conniehnguyen/camelmind"
+  }
+}

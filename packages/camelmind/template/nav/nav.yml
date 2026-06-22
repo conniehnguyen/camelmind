@@ -1,0 +1,20 @@
+nav:
+  - label: "Getting Started"
+    dropdown: true
+    items:
+      - label: "Overview"
+        slug: /getting-started/overview
+        file: content/getting-started/overview.mdx
+        roles: []
+      - label: "Installation"
+        slug: /getting-started/installation
+        file: content/getting-started/installation.mdx
+        roles: []
+
+  - label: "Guides"
+    dropdown: true
+    items:
+      - label: "Writing Docs"
+        slug: /guides/writing-docs
+        file: content/guides/writing-docs.mdx
+        roles: []
