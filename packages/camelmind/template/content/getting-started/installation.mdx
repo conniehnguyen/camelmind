@@ -1,0 +1,51 @@
+---
+title: Installation
+description: Get a CamelMind documentation site running locally in minutes.
+---
+
+# Installation
+
+## Prerequisites
+
+- **Node.js 20+** — [nodejs.org](https://nodejs.org)
+- **npm**, pnpm, or yarn
+
+## Scaffold a new site
+
+```bash
+npx camelmind init my-docs
+cd my-docs
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project structure
+
+```text
+my-docs/
+├── content/              # MDX documentation files
+│   └── getting-started/
+│       ├── overview.mdx
+│       └── installation.mdx
+├── nav/
+│   └── nav.yml           # Site navigation (source of truth for URLs)
+├── versions.yml          # Version registry
+├── camelmind.config.ts   # Site configuration
+└── package.json
+```
+
+## Environment variables
+
+Copy `.env.example` to `.env.local` and edit as needed:
+
+| Variable | Default | Description |
+|---|---|---|
+| `CAMELMIND_URL` | `http://localhost:3000` | Public site URL |
+| `CAMELMIND_AUTH_ENABLED` | `false` | Enable auth/SSO |
+| `CAMELMIND_AUTH_REQUIRE_LOGIN` | `false` | Require login for all pages |
+| `SESSION_SECRET` | — | Required when auth is enabled |
+
+<Callout type="note">
+Auth is disabled by default — your site is fully public until you enable it.
+</Callout>

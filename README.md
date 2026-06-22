@@ -27,14 +27,23 @@ Most documentation platforms force teams to choose between flexibility and ease 
 
 ## Quick Start
 
+Scaffold a new site with the CLI — no git clone needed:
+
 ```bash
-git clone https://github.com/camelmind/camelmind.git my-docs
+npx camelmind init my-docs
 cd my-docs
-npm install
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+### CLI options
+
+```bash
+npx camelmind init my-docs          # scaffold + npm install
+npx camelmind init my-docs --no-install   # scaffold only
+npx camelmind --help                # all commands
+```
 
 ---
 
