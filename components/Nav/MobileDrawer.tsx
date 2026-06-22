@@ -15,6 +15,7 @@ type Props = {
   nav: (NavEntry | NavGroup)[]
   userRoles: string[]
   userName: string | null
+  authEnabled?: boolean
   versions: Version[]
   currentVersionId: string | null
   currentSlug: string
@@ -27,6 +28,7 @@ export function MobileDrawer({
   nav,
   userRoles,
   userName,
+  authEnabled = false,
   versions,
   currentVersionId,
   currentSlug,
@@ -57,11 +59,11 @@ export function MobileDrawer({
   }, [open])
 
   const canSee = (roles: string[]) =>
-    roles.length === 0 || roles.some((r) => userRoles.includes(r))
+    !authEnabled || roles.length === 0 || roles.some((r) => userRoles.includes(r))
 
   async function signOut() {
     await fetch("/api/auth/logout", { method: "POST" })
-    window.location.href = "/login"
+    window.location.href = authEnabled ? "/login" : "/home"
   }
 
   function navigateToVersion(targetId: string) {
@@ -88,8 +90,8 @@ export function MobileDrawer({
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-gray-700">
           <Link href="/home" className="flex items-center gap-2" onClick={onClose}>
-            <img src="/2f-logo.png" alt="Second Front" className="w-6 h-auto invert" />
-            <span className="font-bold text-base">Game Warden</span>
+            <span className="text-[var(--cm-oasis-teal)] font-mono font-bold">&lt;🐪&gt;</span>
+            <span className="font-bold text-base">CamelMind</span>
           </Link>
           <button onClick={onClose} className="p-1 text-gray-400 hover:text-white">
             <X size={20} />
@@ -192,24 +194,26 @@ export function MobileDrawer({
             </div>
           </div>
 
-          {/* User */}
-          <div className="border-t border-gray-700 pt-3">
-            {userName ? (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">{userName}</span>
-                <button
-                  onClick={signOut}
-                  className="text-xs text-gray-400 hover:text-white border border-gray-700 px-2 py-1 rounded"
-                >
-                  Sign out
-                </button>
-              </div>
-            ) : (
-              <Link href="/login" className="block text-sm text-gray-400 hover:text-white">
-                Sign in →
-              </Link>
-            )}
-          </div>
+          {/* User — only when auth is enabled */}
+          {authEnabled && (
+            <div className="border-t border-gray-700 pt-3">
+              {userName ? (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">{userName}</span>
+                  <button
+                    onClick={signOut}
+                    className="text-xs text-gray-400 hover:text-white border border-gray-700 px-2 py-1 rounded"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <Link href="/login" className="block text-sm text-gray-400 hover:text-white">
+                  Sign in →
+                </Link>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </>

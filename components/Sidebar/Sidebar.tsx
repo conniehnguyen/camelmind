@@ -8,9 +8,11 @@ type Props = {
   activeGroup?: NavGroup | null
   currentSlug: string
   userRoles: string[]
+  authEnabled?: boolean
 }
 
-function canSee(roles: string[], userRoles: string[]) {
+function canSee(roles: string[], userRoles: string[], authEnabled: boolean) {
+  if (!authEnabled) return true
   return roles.length === 0 || roles.some((r) => userRoles.includes(r))
 }
 
@@ -21,7 +23,7 @@ function DocLink({ item, currentSlug }: { item: NavChild; currentSlug: string })
     <li>
       <Link
         href={item.slug}
-        style={isActive ? { borderColor: "var(--sf-active-border)", color: "var(--sf-active)" } : {}}
+        style={isActive ? { borderColor: "var(--cm-active-border)", color: "var(--cm-active)" } : {}}
         className={`block py-1.5 pl-4 pr-3 text-sm border-l-2 transition-colors ${
           isActive
             ? "font-medium bg-black/5 dark:bg-white/10"
@@ -39,12 +41,14 @@ function SectionRow({
   section,
   currentSlug,
   userRoles,
+  authEnabled = false,
 }: {
   section: NavChild
   currentSlug: string
   userRoles: string[]
+  authEnabled?: boolean
 }) {
-  const docs = (section.children ?? []).filter((c) => canSee(c.roles, userRoles))
+  const docs = (section.children ?? []).filter((c) => canSee(c.roles, userRoles, authEnabled))
   const hasChildren = docs.length > 0
 
   // Open only if the current page lives inside this section
@@ -60,7 +64,7 @@ function SectionRow({
       <div className="mb-0.5">
         <Link
           href={section.slug}
-          style={currentSlug === section.slug ? { borderColor: "var(--sf-active-border)", color: "var(--sf-active)" } : {}}
+          style={currentSlug === section.slug ? { borderColor: "var(--cm-active-border)", color: "var(--cm-active)" } : {}}
         className={`block py-1.5 pl-4 pr-2 text-sm border-l-2 transition-colors ${
             currentSlug === section.slug
               ? "font-medium bg-black/5 dark:bg-white/10"
@@ -108,12 +112,14 @@ function CategoryBlock({
   entry,
   currentSlug,
   userRoles,
+  authEnabled = false,
 }: {
   entry: NavEntry
   currentSlug: string
   userRoles: string[]
+  authEnabled?: boolean
 }) {
-  const sections = (entry.section ?? []).filter((s) => canSee(s.roles, userRoles))
+  const sections = (entry.section ?? []).filter((s) => canSee(s.roles, userRoles, authEnabled))
   const isCategoryActive = currentSlug === entry.slug
 
   return (
@@ -121,7 +127,7 @@ function CategoryBlock({
       {/* Category label — ALL CAPS, highlighted when on the category landing page */}
       <Link
         href={entry.slug}
-        style={isCategoryActive ? { color: "var(--sf-active)" } : {}}
+        style={isCategoryActive ? { color: "var(--cm-active)" } : {}}
         className={`block px-2 pb-1 text-xs font-semibold uppercase tracking-widest transition-colors select-none ${
           isCategoryActive ? "" : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
         }`}
@@ -135,6 +141,7 @@ function CategoryBlock({
           section={section}
           currentSlug={currentSlug}
           userRoles={userRoles}
+          authEnabled={authEnabled}
         />
       ))}
     </div>
@@ -145,12 +152,14 @@ function GroupSidebar({
   group,
   currentSlug,
   userRoles,
+  authEnabled = false,
 }: {
   group: NavGroup
   currentSlug: string
   userRoles: string[]
+  authEnabled?: boolean
 }) {
-  const visibleItems = group.items.filter((i) => canSee(i.roles, userRoles))
+  const visibleItems = group.items.filter((i) => canSee(i.roles, userRoles, authEnabled))
 
   return (
     <aside className="hidden md:block w-72 shrink-0 border-r border-gray-200 dark:border-gray-800 overflow-y-auto bg-white dark:bg-gray-950">
@@ -161,6 +170,7 @@ function GroupSidebar({
             entry={entry}
             currentSlug={currentSlug}
             userRoles={userRoles}
+            authEnabled={authEnabled}
           />
         ))}
       </div>
@@ -168,13 +178,14 @@ function GroupSidebar({
   )
 }
 
-export function Sidebar({ activeGroup, currentSlug, userRoles }: Props) {
+export function Sidebar({ activeGroup, currentSlug, userRoles, authEnabled = false }: Props) {
   if (activeGroup) {
     return (
       <GroupSidebar
         group={activeGroup}
         currentSlug={currentSlug}
         userRoles={userRoles}
+        authEnabled={authEnabled}
       />
     )
   }

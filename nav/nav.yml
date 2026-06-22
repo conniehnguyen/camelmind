@@ -2,204 +2,47 @@ nav:
   - label: "Getting Started"
     dropdown: true
     items:
-      - label: "Authorization Path"
-        slug: /getting-started/authorization-path
-        file: content/getting-started/authorization-path.mdx
+      - label: "Overview"
+        slug: /getting-started/overview
+        file: content/getting-started/overview.mdx
         roles: []
-        section:
-          - label: "DoW Deployment"
-            slug: /getting-started/authorization-path/dow
-            file: content/getting-started/dow.mdx
-            roles: []
-            children:
-              - label: "Impact Levels Overview"
-                slug: /getting-started/authorization-path/dow/impact-levels
-                file: content/getting-started/dow-impact-levels.mdx
-                roles: []
-              - label: "IL5 Compliance Requirements"
-                slug: /getting-started/authorization-path/dow/il5-compliance
-                file: content/getting-started/dow-il5.mdx
-                roles: []
-              - label: "ATO & Deployment Passport"
-                slug: /getting-started/authorization-path/dow/deployment-passport
-                file: content/getting-started/dow-deployment-passport.mdx
-                roles: []
-          - label: "FedRAMP Deployment"
-            slug: /getting-started/authorization-path/fedramp
-            file: content/getting-started/fedramp.mdx
-            roles: []
-            children:
-              - label: "Account Setup"
-                slug: /getting-started/authorization-path/fedramp/account-setup
-                file: content/getting-started/fedramp-account-setup.mdx
-                roles: []
-              - label: "Access Control"
-                slug: /getting-started/authorization-path/fedramp/access-control
-                file: content/getting-started/fedramp-access-control.mdx
-                roles: []
-              - label: "Security Processes"
-                slug: /getting-started/authorization-path/fedramp/security-processes
-                file: content/getting-started/fedramp-security.mdx
-                roles: []
-          - label: "Commercial Deployment"
-            slug: /getting-started/authorization-path/commercial
-            file: content/getting-started/commercial.mdx
-            roles: []
-            children:
-              - label: "Overview"
-                slug: /getting-started/authorization-path/commercial/overview
-                file: content/getting-started/commercial-overview.mdx
-                roles: []
-              - label: "Account Setup"
-                slug: /getting-started/authorization-path/commercial/account-setup
-                file: content/getting-started/commercial-account-setup.mdx
-                roles: []
-
-      - label: "Entrance Criteria"
-        slug: /getting-started/entrance-criteria
-        file: content/getting-started/entrance-criteria.mdx
+      - label: "Installation"
+        slug: /getting-started/installation
+        file: content/getting-started/installation.mdx
         roles: []
-        section:
-          - label: "General Requirements"
-            slug: /getting-started/entrance-criteria/general-requirements
-            file: content/getting-started/ec-general.mdx
-            roles: []
-          - label: "Technical Requirements"
-            slug: /getting-started/entrance-criteria/technical-requirements
-            file: content/getting-started/ec-technical.mdx
-            roles: []
-          - label: "Supported Design Patterns"
-            slug: /getting-started/entrance-criteria/design-patterns
-            file: content/getting-started/ec-design-patterns.mdx
-            roles: []
-          - label: "Recommended Containers"
-            slug: /getting-started/entrance-criteria/recommended-containers
-            file: content/getting-started/ec-containers.mdx
-            roles: []
 
-      - label: "Onboarding Process"
-        slug: /getting-started/onboarding
-        file: content/getting-started/onboarding.mdx
-        roles: []
-        section:
-          - label: "Quickstart Guide"
-            slug: /getting-started/onboarding/quickstart
-            file: content/getting-started/quickstart.mdx
-            roles: []
-          - label: "Create Your Account"
-            slug: /getting-started/onboarding/create-account
-            file: content/getting-started/create-account.mdx
-            roles: []
-          - label: "Access Control"
-            slug: /getting-started/onboarding/access-control
-            file: content/getting-started/access-control.mdx
-            roles: []
-
-      - label: "Game Warden App"
-        slug: /getting-started/gw-app
-        file: content/getting-started/gw-app.mdx
-        roles: [vendor]
-        section:
-          - label: "App Central"
-            slug: /getting-started/gw-app/app-central
-            file: content/gw-app/app-central.mdx
-            roles: [vendor]
-          - label: "Body of Evidence"
-            slug: /getting-started/gw-app/boe
-            file: content/gw-app/boe.mdx
-            roles: [vendor]
-          - label: "Findings"
-            slug: /getting-started/gw-app/findings
-            file: content/gw-app/findings.mdx
-            roles: [vendor]
-          - label: "Support Tickets"
-            slug: /getting-started/gw-app/support-tickets
-            file: content/gw-app/support-tickets.mdx
-            roles: [vendor]
-
-  - label: "Platform & Security"
+  - label: "Guides"
     dropdown: true
     items:
-      - label: "Platform Architecture"
-        slug: /platform/architecture
-        file: content/platform/architecture.mdx
+      - label: "Writing Docs"
+        slug: /guides/writing-docs
+        file: content/guides/writing-docs.mdx
         roles: []
-        section:
-          - label: "Game Warden Architecture"
-            slug: /platform/architecture/overview
-            file: content/platform/gw-architecture.mdx
-            roles: []
-          - label: "Pipelines & Tooling"
-            slug: /platform/architecture/pipelines
-            file: content/platform/pipelines.mdx
-            roles: []
-          - label: "Managed Services"
-            slug: /platform/architecture/managed-services
-            file: content/platform/managed-services.mdx
-            roles: []
-          - label: "Logging & Monitoring"
-            slug: /platform/architecture/logging
-            file: content/platform/logging.mdx
-            roles: []
-
-      - label: "Supported Services"
-        slug: /platform/supported-services
-        file: content/platform/supported-services.mdx
+      - label: "Navigation"
+        slug: /guides/navigation
+        file: content/guides/navigation.mdx
+        roles: []
+      - label: "MDX Components"
+        slug: /guides/mdx-components
+        file: content/guides/mdx-components.mdx
+        roles: []
+      - label: "Auth & RBAC"
+        slug: /guides/auth-rbac
+        file: content/guides/auth-rbac.mdx
         roles: []
 
-      - label: "Security & Compliance"
-        slug: /platform/security
-        file: content/platform/security.mdx
-        roles: []
-        section:
-          - label: "How GW Protects Your Data"
-            slug: /platform/security/data-protection
-            file: content/platform/security-data-protection.mdx
-            roles: []
-          - label: "Risk Management Framework"
-            slug: /platform/security/rmf
-            file: content/platform/security-rmf.mdx
-            roles: []
-          - label: "ITAR Compliance"
-            slug: /platform/security/itar
-            file: content/platform/security-itar.mdx
-            roles: []
-          - label: "CVEs & Compliance"
-            slug: /platform/security/cves
-            file: content/platform/security-cves.mdx
-            roles: []
-
-  - label: "Integrations"
+  - label: "Reference"
     dropdown: true
     items:
-      - label: "Amazon Bedrock"
-        slug: /integrations/amazon-bedrock
-        file: content/integrations/amazon-bedrock.mdx
+      - label: "Configuration"
+        slug: /reference/configuration
+        file: content/reference/configuration.mdx
+        roles: []
+      - label: "Editor Guide"
+        slug: /internal/editor-guide
+        file: content/internal/editor-guide.mdx
+        roles: [editor]
+      - label: "Admin Guide"
+        slug: /internal/admin-guide
+        file: content/internal/admin-guide.mdx
         roles: [admin]
-      - label: "Cohere"
-        slug: /integrations/cohere
-        file: content/integrations/cohere.mdx
-        roles: [admin]
-
-  - label: "Release Notes"
-    dropdown: true
-    noDropdown: true
-    slug: /release-notes
-    items:
-      - label: "2026"
-        slug: /release-notes/2026
-        file: content/release-notes/index.mdx
-        roles: []
-        section:
-          - label: "June 2026"
-            slug: /release-notes/2026/june
-            file: content/release-notes/2026/june.mdx
-            roles: []
-          - label: "May 2026"
-            slug: /release-notes/2026/may
-            file: content/release-notes/2026/may.mdx
-            roles: []
-          - label: "April 2026"
-            slug: /release-notes/2026/april
-            file: content/release-notes/2026/april.mdx
-            roles: []

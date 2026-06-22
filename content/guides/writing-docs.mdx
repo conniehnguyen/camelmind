@@ -1,0 +1,49 @@
+---
+title: Writing Documentation
+description: Author docs in Markdown and MDX with frontmatter.
+---
+
+# Writing Documentation
+
+CamelMind uses MDX — Markdown with embedded React components. Each doc file lives in `content/` and is registered in `nav/nav.yml`.
+
+## Frontmatter
+
+Every page starts with YAML frontmatter:
+
+```yaml
+---
+title: My Page Title
+description: A short summary shown below the title and in search results.
+---
+```
+
+## Markdown features
+
+CamelMind supports GitHub-flavored Markdown:
+
+- **Bold**, *italic*, and `inline code`
+- Tables, task lists, and strikethrough
+- Fenced code blocks with syntax highlighting
+- Auto-generated heading anchors
+
+## File organization
+
+Organize files however you like under `content/`. The folder structure does not determine URLs — `nav/nav.yml` does:
+
+```yaml
+- label: "My Page"
+  slug: /any/url/path
+  file: content/deeply/nested/my-page.mdx
+  roles: []
+```
+
+## Images
+
+Place static assets in `public/` and reference them in Markdown:
+
+```markdown
+![Architecture diagram](/diagrams/architecture.png
+```
+
+Click any image to zoom in-place on the rendered page.

@@ -1,0 +1,76 @@
+---
+title: Authentication & RBAC
+description: Optional SSO with role-based access control for your documentation.
+---
+
+# Authentication & RBAC
+
+CamelMind supports three auth modes. Auth is **disabled by default** — enable it when you need to gate content.
+
+## Auth modes
+
+| Mode | Config | Behavior |
+|---|---|---|
+| **Public** | `auth.enabled: false` | No login, all docs readable |
+| **RBAC-only** | `enabled: true`, `requireLogin: false` | Public pages open; restricted pages require SSO |
+| **Private site** | `enabled: true`, `requireLogin: true` | Entire site behind SSO |
+
+## Enable auth
+
+In `camelmind.config.ts`:
+
+```typescript
+auth: {
+  enabled: true,
+  requireLogin: false,       // RBAC-only mode
+  provider: "oidc",          // or "dev-mock" for local testing
+  oidc: {
+    issuer: "https://auth.example.com/realms/acme",
+    clientId: process.env.OIDC_CLIENT_ID!,
+    clientSecret: process.env.OIDC_CLIENT_SECRET!,
+    rolesClaim: "realm_access.roles",  // Keycloak
+    roleMapping: {
+      "docs-editors": "editor",
+      "docs-admins": "admin",
+    },
+  },
+}
+```
+
+Or via environment variables:
+
+```bash
+CAMELMIND_AUTH_ENABLED=true
+CAMELMIND_AUTH_PROVIDER=oidc
+OIDC_ISSUER=https://auth.example.com/realms/acme
+OIDC_CLIENT_ID=my-docs-client
+OIDC_CLIENT_SECRET=secret
+SESSION_SECRET=a-random-32-char-string
+```
+
+## Bring your own SSO
+
+Any OIDC-compatible identity provider works:
+
+| Provider | `rolesClaim` suggestion |
+|---|---|
+| Keycloak | `realm_access.roles` |
+| Auth0 | `https://your-app.com/roles` |
+| Okta | `groups` |
+| Azure AD | `groups` or `roles` |
+
+Map IdP group names to nav role names with `roleMapping` when they don't match exactly.
+
+## Development testing
+
+Set `provider: "dev-mock"` and visit `/login` to pick a persona (Reader, Editor, Admin) without configuring an IdP.
+
+<Callout type="important">
+Try it: enable auth with `CAMELMIND_AUTH_ENABLED=true`, restart the dev server, and sign in as **Editor** to see the [Editor Guide](/internal/editor-guide). The [Admin Guide](/internal/admin-guide) requires the admin role.
+</Callout>
+
+## How enforcement works
+
+1. **Navigation** — items with roles you lack are hidden from the header and sidebar
+2. **Page access** — direct URL access to restricted pages redirects to login or shows "Access Restricted"
+3. **Search** — results exclude pages you can't access

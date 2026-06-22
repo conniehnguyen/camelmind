@@ -14,7 +14,7 @@ VERSION=${1:-v2.0}
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT_DIR="$ROOT/out"
 BUILDS_DIR="$ROOT/offline-builds"
-ZIP_NAME="gw-helpcenter-${VERSION}-offline.zip"
+ZIP_NAME="camelmind-${VERSION}-offline.zip"
 
 # API routes that require a live server — stash them outside app/ during static export
 SERVER_ROUTES=(

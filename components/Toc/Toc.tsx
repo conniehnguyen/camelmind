@@ -38,7 +38,7 @@ export function Toc({ entries }: { entries: TocEntry[] }) {
             <a
               href={`#${entry.id}`}
               onClick={() => setActiveId(entry.id)}
-              style={activeId === entry.id ? { borderColor: "var(--sf-active-border)", color: "var(--sf-active)" } : {}}
+              style={activeId === entry.id ? { borderColor: "var(--cm-active-border)", color: "var(--cm-active)" } : {}}
               className={`block text-sm leading-snug py-1 transition-colors border-l-2 -ml-px ${
                 entry.level === 3 ? "pl-5" : "pl-3"
               } ${

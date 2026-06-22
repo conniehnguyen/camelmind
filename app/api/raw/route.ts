@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server"
 import fs from "fs"
 import path from "path"
 import { getSession } from "@/lib/auth"
+import { isAuthEnabled } from "@/lib/config"
 
 export async function GET(req: NextRequest) {
   const session = await getSession()
-  if (!session) {
+  if (isAuthEnabled() && !session) {
     return new NextResponse("Unauthorized", { status: 401 })
   }
 

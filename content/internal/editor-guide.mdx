@@ -1,0 +1,29 @@
+---
+title: Editor Guide
+description: Internal documentation for editors — requires the editor role.
+---
+
+# Editor Guide
+
+This page is restricted to users with the **editor** role. It demonstrates RBAC in action.
+
+<Callout type="note">
+If you can see this page, you're signed in with the editor or admin role. Public visitors and readers without the editor role are redirected to login.
+</Callout>
+
+## Editor responsibilities
+
+- Review and update documentation content
+- Manage navigation changes in `nav/nav.yml`
+- Preview changes locally before publishing
+
+## Content workflow
+
+1. Create or edit MDX files in `content/`
+2. Register pages in `nav/nav.yml`
+3. Run `npm run dev` to preview
+4. Commit and deploy
+
+## Restricted vs. public pages
+
+Use `roles: []` for public pages and `roles: [editor]` for editor-only content. See the [Auth & RBAC guide](/guides/auth-rbac) for full configuration details.

@@ -1,0 +1,49 @@
+---
+title: Navigation
+description: Configure site navigation with YAML — decoupled from file paths.
+---
+
+# Navigation
+
+All navigation is defined in `nav/nav.yml`. File paths and URL slugs are fully independent.
+
+## Basic entry
+
+```yaml
+nav:
+  - label: "Getting Started"
+    dropdown: true
+    items:
+      - label: "Overview"
+        slug: /getting-started/overview
+        file: content/getting-started/overview.mdx
+        roles: []
+```
+
+## Dropdown menus
+
+Top-level groups with `dropdown: true` render as dropdown menus in the header. Each item can have its own sidebar section via the `section` field for nested navigation.
+
+## Role-based visibility
+
+Add a `roles` array to any nav entry:
+
+```yaml
+- label: "Admin Guide"
+  slug: /internal/admin-guide
+  file: content/internal/admin-guide.mdx
+  roles: [admin]
+```
+
+| `roles` value | Who can see it |
+|---|---|
+| `[]` | Everyone (when auth disabled) or any authenticated user |
+| `[editor]` | Users with the `editor` role |
+| `[admin]` | Users with the `admin` role |
+| `[editor, admin]` | Users with either role |
+
+When auth is disabled, all pages are visible regardless of roles.
+
+## Versioning
+
+Define versions in `versions.yml`. Each version can have its own nav file with version-prefixed slugs like `/latest/getting-started/overview`.

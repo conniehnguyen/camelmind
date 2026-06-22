@@ -1,0 +1,77 @@
+---
+title: Configuration Reference
+description: All options in camelmind.config.ts.
+---
+
+# Configuration Reference
+
+Site configuration lives in `camelmind.config.ts` at the project root.
+
+## Site settings
+
+```typescript
+{
+  title: "CamelMind",
+  tagline: "Doc site spun up in minutes.",
+  url: "http://localhost:3000",
+  contentDir: "content",
+  navFile: "nav/nav.yml",
+  versionsFile: "versions.yml",
+}
+```
+
+| Field | Description |
+|---|---|
+| `title` | Site name shown in the header and browser tab |
+| `tagline` | Subtitle on the homepage |
+| `url` | Public URL — used for OIDC redirect URIs |
+| `contentDir` | Directory containing MDX files |
+| `navFile` | Path to the YAML navigation config |
+| `versionsFile` | Path to the versions registry |
+
+## Auth settings
+
+```typescript
+{
+  auth: {
+    enabled: false,
+    requireLogin: false,
+    provider: "dev-mock",  // "dev-mock" | "oidc"
+    oidc: {
+      issuer: "",
+      clientId: "",
+      clientSecret: "",
+      rolesClaim: "realm_access.roles",
+      roleMapping: {},
+    },
+    publicPaths: ["/", "/home", "/login", "/api/auth"],
+  },
+}
+```
+
+## Links
+
+```typescript
+{
+  links: {
+    github: "https://github.com/camelmind/camelmind",
+  },
+}
+```
+
+## Build commands
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Serve production build |
+| `OFFLINE_MODE=true npm run build` | Static export for offline hosting |
+
+## Offline builds
+
+```bash
+./scripts/build-offline.sh latest
+```
+
+Produces a self-contained ZIP in `offline-builds/` that runs on port 8765 with no server required.

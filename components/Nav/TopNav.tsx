@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { Menu } from "lucide-react"
 import { NavEntry, NavGroup, isNavGroup } from "@/lib/nav-types"
 import { VersionSelector } from "./VersionSelector"
@@ -15,13 +14,14 @@ type Props = {
   nav: (NavEntry | NavGroup)[]
   userRoles: string[]
   userName?: string | null
+  authEnabled?: boolean
   versions: Version[]
   currentVersionId: string | null
   currentSlug: string
   versionSlugs: Record<string, string[]>
 }
 
-export function TopNav({ nav, userRoles, userName, versions, currentVersionId, currentSlug, versionSlugs }: Props) {
+export function TopNav({ nav, userRoles, userName, authEnabled = false, versions, currentVersionId, currentSlug, versionSlugs }: Props) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const navRef = useRef<HTMLElement>(null)
@@ -38,19 +38,21 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
 
   async function signOut() {
     await fetch("/api/auth/logout", { method: "POST" })
-    window.location.href = "/login"
+    window.location.href = authEnabled ? "/login" : "/home"
   }
 
   const canSee = (roles: string[]) =>
-    roles.length === 0 || roles.some((r) => userRoles.includes(r))
+    !authEnabled || roles.length === 0 || roles.some((r) => userRoles.includes(r))
 
   return (
     <>
-      <nav ref={navRef} className="bg-gray-900 text-white px-4 md:px-6 py-3 flex items-center gap-4 md:gap-6">
+      <nav ref={navRef} className="bg-[var(--cm-night-dune)] text-[var(--cm-parchment)] px-4 md:px-6 py-3 flex items-center gap-4 md:gap-6 border-b border-[var(--cm-border)]">
         {/* Logo */}
         <Link href="/home" className="flex items-center gap-2 mr-0 md:mr-4 shrink-0">
-          <Image src="/2f-logo.png" alt="Second Front" width={28} height={16} unoptimized className="invert" />
-          <span className="font-bold text-lg">Game Warden</span>
+          <span className="text-[var(--cm-oasis-teal)] font-mono text-lg font-bold">&lt;</span>
+          <span className="text-[var(--cm-camel-gold)] text-xl" aria-hidden="true">🐪</span>
+          <span className="text-[var(--cm-oasis-teal)] font-mono text-lg font-bold">&gt;</span>
+          <span className="font-bold text-lg text-[var(--cm-parchment)] ml-1">CamelMind</span>
         </Link>
 
         {/* Desktop nav items */}
@@ -119,20 +121,22 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
               versionSlugs={versionSlugs}
               isLoggedIn={!!userName}
             />
-            {userName ? (
-              <div className="flex items-center gap-2 border-l border-gray-700 pl-4">
-                <span className="text-xs text-gray-400">{userName}</span>
-                <button
-                  onClick={signOut}
-                  className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-2 py-1 rounded transition-colors"
-                >
-                  Sign out
-                </button>
-              </div>
-            ) : (
-              <a href="/login" className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 px-2 py-1 rounded transition-colors ml-2">
-                Sign in
-              </a>
+            {authEnabled && (
+              userName ? (
+                <div className="flex items-center gap-2 border-l border-[var(--cm-border)] pl-4">
+                  <span className="text-xs text-[var(--cm-text-muted)]">{userName}</span>
+                  <button
+                    onClick={signOut}
+                    className="text-xs text-[var(--cm-text-muted)] hover:text-[var(--cm-parchment)] border border-[var(--cm-border)] hover:border-[var(--cm-oasis-teal)] px-2 py-1 rounded transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <a href="/login" className="text-xs text-[var(--cm-text-muted)] hover:text-[var(--cm-parchment)] border border-[var(--cm-border)] hover:border-[var(--cm-oasis-teal)] px-2 py-1 rounded transition-colors ml-2">
+                  Sign in
+                </a>
+              )
             )}
             <ThemeToggle />
           </div>
@@ -158,6 +162,7 @@ export function TopNav({ nav, userRoles, userName, versions, currentVersionId, c
         nav={nav}
         userRoles={userRoles}
         userName={userName ?? null}
+        authEnabled={authEnabled}
         versions={versions}
         currentVersionId={currentVersionId}
         currentSlug={currentSlug}

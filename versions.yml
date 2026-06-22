@@ -1,16 +1,5 @@
 versions:
-  - id: "v2.0"
-    label: "v2.0 (Latest)"
+  - id: "latest"
+    label: "Latest"
     stable: true
-    nav: nav/nav-v2.0.yml
-
-  - id: "v1.9"
-    label: "v1.9"
-    stable: true
-    nav: nav/nav-v1.9.yml
-
-  - id: "dev"
-    label: "dev"
-    stable: false
-    badge: "Beta"
-    nav: nav/nav-dev.yml
+    nav: nav/nav.yml

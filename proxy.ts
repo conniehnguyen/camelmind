@@ -1,32 +1,31 @@
 import { NextRequest, NextResponse } from "next/server"
 import { jwtVerify } from "jose"
-
-const COOKIE_NAME = "gw_session"
-
-if (!process.env.SESSION_SECRET) {
-  throw new Error("SESSION_SECRET environment variable is not set")
-}
-
-const SECRET = new TextEncoder().encode(process.env.SESSION_SECRET)
-
-// Pages that are always public (no auth required regardless of nav roles)
-// Actual per-page role enforcement still happens in page.tsx
-const PUBLIC_PATHS = ["/login", "/api/auth", "/_next", "/favicon.ico"]
+import { COOKIE_NAME, getSecret } from "@/lib/auth"
+import { isAuthEnabled, isPrivateSite, isPublicPath } from "@/lib/config"
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  // Let public paths through unconditionally
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+  // Auth disabled — all traffic passes through
+  if (!isAuthEnabled()) {
     return NextResponse.next()
   }
 
-  // Allow the homepage and root redirect through — they handle their own display
-  if (pathname === "/" || pathname === "/home") {
+  // Always allow public paths and Next.js internals
+  if (
+    isPublicPath(pathname) ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon")
+  ) {
     return NextResponse.next()
   }
 
-  // For all other paths, check for a valid session cookie
+  // RBAC-only mode: per-page enforcement happens in page.tsx
+  if (!isPrivateSite()) {
+    return NextResponse.next()
+  }
+
+  // Private site mode: require valid session for all non-public paths
   const token = req.cookies.get(COOKIE_NAME)?.value
   if (!token) {
     const loginUrl = new URL("/login", req.url)
@@ -35,10 +34,9 @@ export async function proxy(req: NextRequest) {
   }
 
   try {
-    await jwtVerify(token, SECRET)
+    await jwtVerify(token, getSecret())
     return NextResponse.next()
   } catch {
-    // Token invalid or expired — send to login
     const loginUrl = new URL("/login", req.url)
     loginUrl.searchParams.set("returnTo", pathname)
     const res = NextResponse.redirect(loginUrl)

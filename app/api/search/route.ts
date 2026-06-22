@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { loadNav, getAllSlugs, getNavEntryBySlug, getSectionForSlug } from "@/lib/nav"
 import { loadMdxFile } from "@/lib/mdx"
 import { getSession, hasAccess } from "@/lib/auth"
+import { isAuthEnabled } from "@/lib/config"
 import type { NavGroup } from "@/lib/nav-types"
 
 type SearchIndex = {
@@ -77,19 +78,21 @@ function buildIndex(): SearchIndex[] {
 
 export async function GET(req: NextRequest) {
   const session = await getSession()
-  if (!session) {
+  const authEnabled = isAuthEnabled()
+
+  if (authEnabled && !session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
+  const userRoles = session?.roles ?? []
   const q = req.nextUrl.searchParams.get("q")?.toLowerCase().trim() ?? ""
   const filterGroup = req.nextUrl.searchParams.get("group") ?? ""
   const filterRole = req.nextUrl.searchParams.get("role") ?? ""
 
   const index = buildIndex()
-  // Only show docs the current user's roles can access
-  const accessible = index.filter((doc) => hasAccess(doc.roles, session.roles))
-
-  // Return all groups for filter chips when no query
+  const accessible = authEnabled
+    ? index.filter((doc) => hasAccess(doc.roles, userRoles))
+    : index
   if (!q) {
     const groups = [...new Set(accessible.map((d) => d.group).filter(Boolean))]
     return NextResponse.json({ results: [], groups })
