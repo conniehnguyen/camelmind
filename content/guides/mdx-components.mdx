@@ -1,0 +1,64 @@
+---
+title: MDX Components
+description: Built-in components for callouts, steps, tabs, and collapsible sections.
+---
+
+# MDX Components
+
+CamelMind registers components globally — use them in any MDX file without imports.
+
+## Callout
+
+```mdx
+<Callout type="tip">
+  Helpful advice for the reader.
+</Callout>
+```
+
+<Callout type="tip">
+This is a tip callout styled with the CamelMind Sahara theme.
+</Callout>
+
+<Callout type="warning">
+This is a warning callout.
+</Callout>
+
+<Callout type="important">
+This is an important callout.
+</Callout>
+
+## Steps
+
+```mdx
+<Steps>
+<Step n={1} title="First step">Do this first.</Step>
+<Step n={2} title="Second step">Then do this.</Step>
+</Steps>
+```
+
+## Details (collapsible)
+
+```mdx
+<Details id="advanced" summary="Advanced configuration">
+  Hidden content that expands on click.
+</Details>
+```
+
+<Details id="example-details" summary="Click to expand an example">
+This content is hidden until the reader expands the section. Details blocks are anchor-linkable via their `id`.
+</Details>
+
+## Code blocks
+
+Fenced code blocks render with a language label and copy button:
+
+```bash
+npm run dev
+```
+
+```typescript
+export default {
+  title: "My Docs",
+  tagline: "Documentation for my product",
+}
+```

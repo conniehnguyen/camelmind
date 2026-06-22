@@ -4,18 +4,77 @@
 /* Tailwind v4 dark mode — toggled by .dark class on <html> */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ── Second Front brand tokens ── */
+/* ── CamelMind design tokens (Sahara theme) ── */
 :root {
-  --sf-active: #111827;        /* active sidebar item + ToC heading */
-  --sf-active-border: #111827; /* active left border */
+  --cm-camel-gold: #D8A15B;
+  --cm-sandstone: #F4D6A7;
+  --cm-oasis-teal: #4BA8B7;
+  --cm-caravan-brown: #6A4B33;
+  --cm-night-dune: #1E2833;
+  --cm-parchment: #FFF6E9;
+  --cm-dune-beige: #E7D7BF;
+  --cm-palm-green: #8FA65C;
+  --cm-sunset-gold: #E8B34E;
+  --cm-shadow-brown: #4B3424;
+  --cm-border-sand: #E6DCCB;
+
+  --cm-primary: var(--cm-oasis-teal);
+  --cm-success: #5B9B62;
+  --cm-warning: #D9A441;
+  --cm-danger: #C76B56;
+
+  --cm-bg-primary: var(--cm-parchment);
+  --cm-bg-secondary: #FCF8F1;
+  --cm-bg-tertiary: #F7F1E7;
+  --cm-text-primary: var(--cm-caravan-brown);
+  --cm-text-secondary: #7A624F;
+  --cm-text-muted: #9B8876;
+  --cm-border: var(--cm-border-sand);
+  --cm-link: var(--cm-oasis-teal);
+  --cm-link-hover: #388A97;
+
+  --cm-btn-primary-bg: var(--cm-oasis-teal);
+  --cm-btn-primary-text: #FFFFFF;
+
+  --cm-note-bg: #EAF7FA;
+  --cm-note-border: #4BA8B7;
+  --cm-tip-bg: #EEF7EC;
+  --cm-tip-border: #5B9B62;
+  --cm-warning-bg: #FFF6E2;
+  --cm-warning-border: #D9A441;
+  --cm-danger-bg: #FFF0EC;
+  --cm-danger-border: #C76B56;
+
+  --cm-radius-md: 10px;
+  --cm-font-heading: var(--font-alegreya), Georgia, serif;
+  --cm-font-body: var(--font-inter), system-ui, sans-serif;
+  --cm-font-mono: var(--font-jetbrains-mono), monospace;
+
+  --cm-active: var(--cm-oasis-teal);
+  --cm-active-border: var(--cm-oasis-teal);
 }
 
 .dark {
-  --sf-active: #f9fafb;
-  --sf-active-border: #f9fafb;
+  --cm-bg-primary: #1E2833;
+  --cm-bg-secondary: #26323F;
+  --cm-bg-tertiary: #2D3B4A;
+  --cm-text-primary: #F8F2E8;
+  --cm-text-secondary: #D7C8B4;
+  --cm-text-muted: #B8A996;
+  --cm-border: #3B4A5A;
+  --cm-link: #63C1CF;
+  --cm-link-hover: #7AD2DE;
+  --cm-active: #63C1CF;
+  --cm-active-border: #63C1CF;
 }
 
-/* ── Callout / Admonition styles from Second Front brand ── */
+.cm-primary-button {
+  background: var(--cm-btn-primary-bg);
+  color: var(--cm-btn-primary-text);
+  border-radius: var(--cm-radius-md);
+}
+
+/* ── Callout / Admonition styles ── */
 
 .callout {
   margin-bottom: 1.25rem;
@@ -42,32 +101,26 @@
   color: #333;
 }
 
-/* note */
-.callout.note  { border-color: #adcafb; }
-.callout.note  .callout-header { background-color: #adcafb; }
+.callout.note  { border-color: var(--cm-note-border); }
+.callout.note  .callout-header { background-color: var(--cm-note-bg); color: var(--cm-text-primary); }
 
-/* tip */
-.callout.tip   { border-color: #8faefc; }
-.callout.tip   .callout-header { background-color: #8faefc; }
+.callout.tip   { border-color: var(--cm-tip-border); }
+.callout.tip   .callout-header { background-color: var(--cm-tip-bg); color: var(--cm-text-primary); }
 
-/* warning */
-.callout.warning { border-color: #fdd9be; }
-.callout.warning .callout-header { background-color: #fdd9be; }
+.callout.warning { border-color: var(--cm-warning-border); }
+.callout.warning .callout-header { background-color: var(--cm-warning-bg); color: var(--cm-text-primary); }
 
-/* important */
-.callout.important { border-color: #2ec4b6; background-color: #fff; }
-.callout.important .callout-header { background-color: #e9f6f4; }
+.callout.important { border-color: var(--cm-oasis-teal); }
+.callout.important .callout-header { background-color: var(--cm-note-bg); color: var(--cm-text-primary); }
 
-/* danger */
-.callout.danger  { border-color: #faaaa7; }
-.callout.danger  .callout-header { background-color: #faaaa7; }
+.callout.danger  { border-color: var(--cm-danger-border); }
+.callout.danger  .callout-header { background-color: var(--cm-danger-bg); color: var(--cm-text-primary); }
 
-/* success */
-.callout.success { border-color: #d2f9d2; }
-.callout.success .callout-header { background-color: #d2f9d2; }
+.callout.success { border-color: var(--cm-tip-border); }
+.callout.success .callout-header { background-color: var(--cm-tip-bg); color: var(--cm-text-primary); }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--cm-font-body);
 }
 
 /* ── Prose refinements ── */
@@ -349,6 +402,12 @@ body {
   color: #e2e8f0;
 }
 
+/* Prose link styles override the circle's color — win specificity back */
+.prose .timeline-step-anchor,
+.dark .prose .timeline-step-anchor {
+  color: white;
+}
+
 /* Dark timeline */
 .dark .timeline-item::before {
   background-color: #4b5563;
@@ -356,6 +415,7 @@ body {
 
 .dark .timeline-step-anchor {
   background-color: #4b5563;
+  color: white;
 }
 
 .dark .timeline-step-anchor:hover {

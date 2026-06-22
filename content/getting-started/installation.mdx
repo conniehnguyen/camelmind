@@ -1,0 +1,50 @@
+---
+title: Installation
+description: Get a CamelMind documentation site running locally.
+---
+
+# Installation
+
+## Prerequisites
+
+- Node.js 20+
+- npm, pnpm, or yarn
+
+## Quick start
+
+```bash
+git clone https://github.com/camelmind/camelmind.git my-docs
+cd my-docs
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project structure
+
+```text
+my-docs/
+├── content/              # MDX documentation files
+├── nav/
+│   └── nav.yml           # Site navigation
+├── camelmind.config.ts   # Site configuration
+├── versions.yml          # Version registry (optional)
+└── package.json
+```
+
+## Environment variables
+
+Copy `.env.example` to `.env.local` and set values as needed:
+
+| Variable | Required | Description |
+|---|---|---|
+| `SESSION_SECRET` | When auth enabled | Secret for session cookies |
+| `CAMELMIND_AUTH_ENABLED` | No | Set to `true` to enable auth |
+| `OIDC_ISSUER` | For OIDC | Your IdP issuer URL |
+| `OIDC_CLIENT_ID` | For OIDC | OAuth client ID |
+| `OIDC_CLIENT_SECRET` | For OIDC | OAuth client secret |
+
+<Callout type="note">
+Auth is **disabled by default**. Your docs site is fully public until you enable it in `camelmind.config.ts`.
+</Callout>

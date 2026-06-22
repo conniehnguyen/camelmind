@@ -1,0 +1,32 @@
+---
+title: Admin Guide
+description: Internal administration documentation — requires the admin role.
+---
+
+# Admin Guide
+
+This page requires the **admin** role. Only admin users can access it.
+
+<Callout type="warning">
+Admin pages often contain sensitive configuration details. Use `roles: [admin]` in nav.yml and enable OIDC auth in production.
+</Callout>
+
+## Admin tasks
+
+- Configure SSO / OIDC credentials
+- Manage role mappings between your IdP and nav roles
+- Set up offline build pipelines
+- Control version visibility in `versions.yml`
+
+## Production auth checklist
+
+- [ ] Set `auth.enabled: true` and `provider: "oidc"`
+- [ ] Configure `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`
+- [ ] Set a strong `SESSION_SECRET`
+- [ ] Map IdP groups to nav roles via `roleMapping`
+- [ ] Test each role can only see permitted pages
+- [ ] Verify search excludes restricted content for unauthorized users
+
+## Private site mode
+
+For fully internal documentation, set `requireLogin: true` to gate the entire site behind SSO — not just individual pages.

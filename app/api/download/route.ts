@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server"
 import fs from "fs"
 import path from "path"
 import { getSession } from "@/lib/auth"
+import { isAuthEnabled } from "@/lib/config"
 import { loadVersions } from "@/lib/versions"
 
 export async function GET(req: NextRequest) {
-  // Must be logged in — packages contain all role-gated content
   const session = await getSession()
-  if (!session) {
+  if (isAuthEnabled() && !session) {
     return new NextResponse("Unauthorized", { status: 401 })
   }
 
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (type === "pdf") {
-    const pdfPath = path.join(process.cwd(), "offline-builds", `Game-Warden-Help-Center-${versionId}.pdf`)
+    const pdfPath = path.join(process.cwd(), "offline-builds", `camelmind-${versionId}.pdf`)
     if (!fs.existsSync(pdfPath)) {
       return new NextResponse("PDF not yet built for this version", { status: 404 })
     }
@@ -44,14 +44,14 @@ export async function GET(req: NextRequest) {
     return new NextResponse(buffer, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="Game-Warden-Help-Center-${versionId}.pdf"`,
+        "Content-Disposition": `attachment; filename="camelmind-${versionId}.pdf"`,
         "Content-Length": stat.size.toString(),
       },
     })
   }
 
   // Default: ZIP
-  const zipPath = path.join(process.cwd(), "offline-builds", `gw-helpcenter-${versionId}-offline.zip`)
+  const zipPath = path.join(process.cwd(), "offline-builds", `camelmind-${versionId}-offline.zip`)
   if (!fs.existsSync(zipPath)) {
     return new NextResponse("Offline package not yet built for this version", { status: 404 })
   }
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
   return new NextResponse(buffer, {
     headers: {
       "Content-Type": "application/zip",
-      "Content-Disposition": `attachment; filename="gw-helpcenter-${versionId}-offline.zip"`,
+      "Content-Disposition": `attachment; filename="camelmind-${versionId}-offline.zip"`,
       "Content-Length": stat.size.toString(),
     },
   })

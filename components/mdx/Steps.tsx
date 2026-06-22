@@ -15,16 +15,16 @@ function slugify(title: string) {
     .replace(/(^-|-$)/g, "")
 }
 
-export function Step({ step, title, children }: { step: string | number; title: string; children: React.ReactNode }) {
-  const id = slugify(title)
+export function Step({ n, title, children }: { n: string | number; title: string; children: React.ReactNode }) {
+  const id = slugify(String(title))
   return (
-    <div className="timeline-item" id={id} data-step={step} style={{ scrollMarginTop: "5rem" }}>
+    <div className="timeline-item" id={id} data-step={n} style={{ scrollMarginTop: "5rem" }}>
       <a
         href={`#${id}`}
         className="timeline-step-anchor"
-        aria-label={`Link to step ${step}: ${title}`}
+        aria-label={`Link to step ${n}: ${title}`}
       >
-        {step}
+        {n}
       </a>
       <h3>{title}</h3>
       <div>{children}</div>

@@ -1,22 +1,46 @@
 ---
-title: "Overview"
-description: "Introduction to Game Warden"
-roles: []
-tags: [getting-started]
+title: Welcome to CamelMind
+description: Open-source docs-as-code platform for documentation sites and developer portals.
 ---
 
-Game Warden is a secure platform for DoD software deployment. This guide covers the essentials.
+# Welcome to CamelMind
+
+CamelMind is an open-source documentation platform built on Next.js. Write docs in Markdown, configure navigation in YAML, and publish a beautiful site in minutes.
 
 <Callout type="tip">
-  You can access Game Warden from NIPRNet or through approved access pathways.
+Your documentation journey starts here. Add Markdown files to the `content/` folder and define your nav in `nav/nav.yml`.
 </Callout>
 
-## What is Game Warden?
+## Why CamelMind?
 
-Game Warden provides a FedRAMP and IL4/IL5-ready environment for deploying containerized applications.
+Most documentation platforms force teams to choose between flexibility and ease of use. CamelMind gives you both:
 
-## Key Concepts
+- **Markdown-first** authoring with MDX components
+- **YAML navigation** decoupled from file paths
+- **Built-in search** across all docs
+- **Version support** for multi-release documentation
+- **Optional SSO + RBAC** for internal and public docs on the same site
+- **Static export** for offline or self-hosted deployments
 
-- **App Central** — the main interface for vendors to submit and manage applications
-- **Body of Evidence (BoE)** — the documentation package required for ATO
-- **Findings** — security issues surfaced during pipeline scans
+## Next steps
+
+<Steps>
+<Step n={1} title="Install dependencies">
+
+```bash
+npm install
+npm run dev
+```
+
+</Step>
+<Step n={2} title="Edit your first page">
+
+Add or edit files in `content/` and register them in `nav/nav.yml`.
+
+</Step>
+<Step n={3} title="Configure your site">
+
+Customize `camelmind.config.ts` with your site title, auth settings, and links.
+
+</Step>
+</Steps>

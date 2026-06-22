@@ -11,7 +11,8 @@ import {
   getSectionForSlugFromConfig,
 } from "@/lib/nav"
 import { loadMdxFile } from "@/lib/mdx"
-import { getSession, hasAccess } from "@/lib/auth"
+import { getSession, hasAccess, pageRequiresAuth, shouldRedirectToLogin } from "@/lib/auth"
+import { isAuthEnabled } from "@/lib/config"
 import { loadVersions, getVersionFromSlug, getNavForVersion } from "@/lib/versions"
 import { TopNav } from "@/components/Nav/TopNav"
 import { Sidebar } from "@/components/Sidebar/Sidebar"
@@ -63,22 +64,22 @@ export default async function DocPage({ params }: Props) {
   if (!navEntry) return notFound()
 
   const session = await getSession()
+  const authEnabled = isAuthEnabled()
 
-  if (!hasAccess(navEntry.roles, session?.roles ?? [])) {
-    // Not logged in at all → send to login page with return URL
-    if (!session) {
-      redirect(`/login?returnTo=${encodeURIComponent(fullSlug)}`)
-    }
-    // Logged in but wrong role → show access denied
+  if (shouldRedirectToLogin(navEntry.roles, session)) {
+    redirect(`/login?returnTo=${encodeURIComponent(fullSlug)}`)
+  }
+
+  if (pageRequiresAuth(navEntry.roles) && session && !hasAccess(navEntry.roles, session.roles)) {
     return (
       <div className="flex flex-col h-screen">
-        <TopNav nav={nav.nav} userRoles={session.roles} userName={session.name} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} />
-        <div className="flex flex-1 items-center justify-center">
+        <TopNav nav={nav.nav} userRoles={session.roles} userName={session.name} authEnabled={authEnabled} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} />
+        <div className="flex flex-1 items-center justify-center bg-[var(--cm-bg-primary)]">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Restricted</h1>
-            <p className="text-gray-500">You don&apos;t have permission to view this page.</p>
-            <p className="text-xs text-gray-400 mt-2">
-              Required roles: {navEntry.roles.join(", ")} · Your roles: {session.roles.join(", ")}
+            <h1 className="text-2xl font-bold text-[var(--cm-text-primary)] mb-2">Access Restricted</h1>
+            <p className="text-[var(--cm-text-secondary)]">You don&apos;t have permission to view this page.</p>
+            <p className="text-xs text-[var(--cm-text-muted)] mt-2">
+              Required roles: {navEntry.roles.join(", ")} · Your roles: {session.roles.join(", ") || "none"}
             </p>
           </div>
         </div>
@@ -93,9 +94,9 @@ export default async function DocPage({ params }: Props) {
 
   return (
     <div className="flex flex-col h-screen">
-      <TopNav nav={nav.nav} userRoles={session?.roles ?? []} userName={session?.name ?? null} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} />
+      <TopNav nav={nav.nav} userRoles={session?.roles ?? []} userName={session?.name ?? null} authEnabled={authEnabled} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar activeGroup={activeGroup} currentSlug={fullSlug} userRoles={session?.roles ?? []} />
+        <Sidebar activeGroup={activeGroup} currentSlug={fullSlug} userRoles={session?.roles ?? []} authEnabled={authEnabled} />
         <main className="flex-1 overflow-y-auto bg-white dark:bg-gray-950">
           <div className="flex max-w-5xl mx-auto">
             <article className="flex-1 px-4 md:px-10 py-6 md:py-8 min-w-0">
@@ -119,6 +120,8 @@ export default async function DocPage({ params }: Props) {
                   source={source}
                   components={mdxComponents}
                   options={{
+                    // blockJS must be false so JSX prop expressions like n={1} are not stripped
+                    blockJS: false,
                     mdxOptions: {
                       remarkPlugins: [remarkGfm],
                       rehypePlugins: [

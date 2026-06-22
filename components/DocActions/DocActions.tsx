@@ -17,7 +17,7 @@ export function DocActions({ file, downloadPdf, offline }: Props) {
         <a
           href={downloadPdf}
           download
-          className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
         >
           <Download size={14} />
           Download PDF
@@ -34,7 +34,7 @@ export function DocActions({ file, downloadPdf, offline }: Props) {
         href={rawBase}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors"
+        className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
       >
         <FileText size={14} />
         View as Markdown
@@ -42,7 +42,7 @@ export function DocActions({ file, downloadPdf, offline }: Props) {
       <a
         href={`${rawBase}&download=1`}
         download
-        className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors"
+        className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
       >
         <Download size={14} />
         Download Markdown
@@ -51,7 +51,7 @@ export function DocActions({ file, downloadPdf, offline }: Props) {
         <a
           href={downloadPdf}
           download
-          className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
         >
           <Download size={14} />
           Download PDF

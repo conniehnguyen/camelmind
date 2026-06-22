@@ -14,7 +14,7 @@ type SearchResult = {
 }
 
 const ROLE_FILTERS = [
-  { label: "Vendor", value: "vendor" },
+  { label: "Editor", value: "editor" },
   { label: "Admin", value: "admin" },
 ]
 

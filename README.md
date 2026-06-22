@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CamelMind
 
-## Getting Started
+**Doc site spun up in minutes.**
 
-First, run the development server:
+Open-source docs-as-code platform for documentation sites, API references, and developer portals.
+
+Build beautiful documentation from Markdown and MDX. Publish instantly, deploy anywhere, and keep documentation close to your code.
+
+[Get Started](#quick-start) · [Documentation](/getting-started/overview) · [Auth & RBAC](/guides/auth-rbac)
+
+---
+
+## Why CamelMind?
+
+Most documentation platforms force teams to choose between flexibility and ease of use. CamelMind gives you both.
+
+- Markdown-first authoring with MDX components
+- YAML navigation decoupled from file paths
+- Instant local development with Next.js
+- Built-in full-text search
+- Beautiful Sahara theme with light and dark modes
+- Optional SSO + role-based access control
+- Static export for offline or self-hosted deployments
+- Fully open source (MIT)
+
+---
+
+## Quick Start
 
 ```bash
+git clone https://github.com/camelmind/camelmind.git my-docs
+cd my-docs
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```text
+my-docs/
+├── content/              # MDX documentation files
+├── nav/
+│   └── nav.yml           # Site navigation + RBAC roles
+├── camelmind.config.ts   # Site configuration
+├── versions.yml          # Version registry
+└── package.json
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Configuration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Edit `camelmind.config.ts` to customize your site:
 
-## Deploy on Vercel
+```typescript
+export default {
+  title: "My Docs",
+  tagline: "Documentation for my product",
+  auth: {
+    enabled: false,        // set true for SSO + RBAC
+    provider: "oidc",      // or "dev-mock" for local testing
+  },
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See the [Configuration Reference](/reference/configuration) for all options.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Authentication (Optional)
+
+Auth is **disabled by default**. When enabled, CamelMind supports:
+
+| Mode | Behavior |
+|---|---|
+| **Public** | No login required (default) |
+| **RBAC-only** | Public pages open; role-gated pages require SSO |
+| **Private site** | Entire site behind SSO |
+
+Bring your own OIDC identity provider — Keycloak, Auth0, Okta, Azure AD, and others work out of the box. See [Auth & RBAC](/guides/auth-rbac).
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE).
