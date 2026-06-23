@@ -77,7 +77,10 @@ async function init(projectName, options) {
       process.exit(1);
     }
     await fs.copy(TEMPLATE_DIR, targetDir, {
-      filter: (src) => !src.includes("node_modules") && !src.includes(".next") && !src.includes(".git")
+      filter: (src) => {
+        const rel = path.relative(TEMPLATE_DIR, src);
+        return !rel.includes("node_modules") && !rel.includes(".next") && !rel.includes(".git");
+      }
     });
     const pkgSrc = path.join(targetDir, "_package.json");
     const pkgDest = path.join(targetDir, "package.json");
