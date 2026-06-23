@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "CamelMind documentation site (monorepo root)",
   "license": "MIT",
-  "private": true,
+  "private": false,
   "workspaces": [
     "packages/*"
   ],
