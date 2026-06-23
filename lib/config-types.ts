@@ -16,6 +16,12 @@ export type AuthConfig = {
   publicPaths: string[]
 }
 
+export type SiteFeatures = {
+  showLastUpdated?: boolean
+  showLastUpdateAuthor?: boolean
+  showFeedbackWidget?: boolean
+}
+
 export type CamelMindConfig = {
   title: string
   tagline: string
@@ -27,4 +33,5 @@ export type CamelMindConfig = {
   links: {
     github?: string
   }
+  site?: SiteFeatures
 }

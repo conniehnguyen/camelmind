@@ -12,7 +12,7 @@ import {
 } from "@/lib/nav"
 import { loadMdxFile } from "@/lib/mdx"
 import { getSession, hasAccess, pageRequiresAuth, shouldRedirectToLogin } from "@/lib/auth"
-import { isAuthEnabled } from "@/lib/config"
+import { isAuthEnabled, showLastUpdated, showLastUpdateAuthor, showFeedbackWidget } from "@/lib/config"
 import { loadVersions, getVersionFromSlug, getNavForVersion } from "@/lib/versions"
 import { TopNav } from "@/components/Nav/TopNav"
 import { Sidebar } from "@/components/Sidebar/Sidebar"
@@ -21,6 +21,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs/Breadcrumbs"
 import { PageNav } from "@/components/PageNav/PageNav"
 import { SectionCards } from "@/components/SectionCards/SectionCards"
 import { DocActions } from "@/components/DocActions/DocActions"
+import { LastUpdated } from "@/components/LastUpdated/LastUpdated"
+import { DocFeedback } from "@/components/DocFeedback/DocFeedback"
 import { ZoomImages } from "@/components/ZoomImages/ZoomImages"
 import { mdxComponents } from "@/components/mdx"
 import type { NavGroup, NavEntry } from "@/lib/nav-types"
@@ -89,7 +91,7 @@ export default async function DocPage({ params }: Props) {
 
   const activeGroup = getGroupForSlugFromConfig(nav, fullSlug) as NavGroup | null
   const sectionEntry = getSectionForSlugFromConfig(nav, fullSlug) as NavEntry | null
-  const { frontmatter, source, toc } = loadMdxFile(navEntry.file)
+  const { frontmatter, source, toc, lastUpdated, lastUpdatedAuthor } = loadMdxFile(navEntry.file)
   const isSectionRoot = sectionEntry?.slug === fullSlug
 
   return (
@@ -137,7 +139,21 @@ export default async function DocPage({ params }: Props) {
                   <SectionCards entry={sectionEntry} />
                 </div>
               )}
-              <div data-print="hide">
+              <div data-print="hide" className="mt-12">
+                <div className="flex items-center justify-between mb-6">
+                  {showLastUpdated() && lastUpdated ? (
+                    <LastUpdated
+                      date={lastUpdated}
+                      author={showLastUpdateAuthor() ? lastUpdatedAuthor : null}
+                    />
+                  ) : <div />}
+                  {showFeedbackWidget() && (
+                    <DocFeedback
+                      pageTitle={frontmatter.title}
+                      pageSlug={fullSlug}
+                    />
+                  )}
+                </div>
                 <PageNav activeGroup={activeGroup} currentSlug={fullSlug} />
               </div>
             </article>

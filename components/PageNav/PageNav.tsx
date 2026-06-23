@@ -1,5 +1,5 @@
 import Link from "next/link"
-import type { NavGroup, NavChild } from "@/lib/nav-types"
+import type { NavGroup } from "@/lib/nav-types"
 
 type PageEntry = { label: string; slug: string }
 
@@ -39,7 +39,7 @@ export function PageNav({ activeGroup, currentSlug }: Props) {
   if (!prev && !next) return null
 
   return (
-    <div className="flex justify-between items-center mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
+    <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-800">
       {prev ? (
         <Link
           href={prev.slug}
