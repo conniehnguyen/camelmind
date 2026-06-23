@@ -86,10 +86,14 @@ export async function init(
     }
 
     await fs.copy(TEMPLATE_DIR, targetDir, {
-      filter: (src) =>
-        !src.includes("node_modules") &&
-        !src.includes(".next") &&
-        !src.includes(".git"),
+      filter: (src) => {
+        const rel = path.relative(TEMPLATE_DIR, src)
+        return (
+          !rel.includes("node_modules") &&
+          !rel.includes(".next") &&
+          !rel.includes(".git")
+        )
+      },
     })
 
     // Rename _package.json → package.json (with project name substitution)
