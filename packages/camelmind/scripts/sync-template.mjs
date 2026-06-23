@@ -45,10 +45,14 @@ async function copyDir(src, dest) {
   await rm(dest, { recursive: true, force: true })
   await cp(src, dest, {
     recursive: true,
-    filter: (s) =>
-      !s.includes("node_modules") &&
-      !s.includes(".next") &&
-      !s.includes(".git"),
+    filter: (s) => {
+      const rel = path.relative(src, s)
+      return (
+        !rel.includes("node_modules") &&
+        !rel.includes(".next") &&
+        !rel.includes(".git")
+      )
+    },
   })
   console.log(`  ${green("✓")}     ${path.relative(ROOT_DIR, src)}/`)
 }

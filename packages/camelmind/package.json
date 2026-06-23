@@ -15,7 +15,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "prepublishOnly": "npm run build"
+    "sync-template": "node scripts/sync-template.mjs",
+    "prepublishOnly": "npm run sync-template && npm run build"
   },
   "dependencies": {
     "chalk": "^5.3.0",
