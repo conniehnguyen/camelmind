@@ -1,5 +1,6 @@
 import fs from "fs"
 import path from "path"
+import { execSync } from "child_process"
 import matter from "gray-matter"
 
 export type FrontMatter = {
@@ -8,6 +9,7 @@ export type FrontMatter = {
   roles?: string[]
   tags?: string[]
   download_pdf?: string
+  last_updated?: string
 }
 
 export type TocEntry = {
@@ -20,6 +22,8 @@ export type DocContent = {
   frontmatter: FrontMatter
   source: string
   toc: TocEntry[]
+  lastUpdated: Date | null
+  lastUpdatedAuthor: string | null
 }
 
 function extractToc(source: string): TocEntry[] {
@@ -44,10 +48,32 @@ export function loadMdxFile(filePath: string): DocContent {
   const fullPath = path.join(process.cwd(), filePath)
   const raw = fs.readFileSync(fullPath, "utf-8")
   const { data, content } = matter(raw)
+  const frontmatter = data as FrontMatter
+
+  let lastUpdated: Date | null = null
+  if (frontmatter.last_updated) {
+    const parsed = new Date(frontmatter.last_updated)
+    if (!isNaN(parsed.getTime())) lastUpdated = parsed
+  } else {
+    lastUpdated = fs.statSync(fullPath).mtime
+  }
+
+  let lastUpdatedAuthor: string | null = null
+  try {
+    const result = execSync(`git log -1 --format="%an" -- "${fullPath}"`, {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim()
+    if (result) lastUpdatedAuthor = result
+  } catch {
+    // not a git repo or git unavailable
+  }
 
   return {
-    frontmatter: data as FrontMatter,
+    frontmatter,
     source: content,
     toc: extractToc(content),
+    lastUpdated,
+    lastUpdatedAuthor,
   }
 }

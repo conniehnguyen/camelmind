@@ -27,3 +27,15 @@ export function isPublicPath(pathname: string): boolean {
   const { publicPaths } = getAuthConfig()
   return publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))
 }
+
+export function showLastUpdated(): boolean {
+  return getConfig().site?.showLastUpdated !== false
+}
+
+export function showLastUpdateAuthor(): boolean {
+  return getConfig().site?.showLastUpdateAuthor === true
+}
+
+export function showFeedbackWidget(): boolean {
+  return getConfig().site?.showFeedbackWidget === true
+}

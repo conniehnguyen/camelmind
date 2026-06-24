@@ -45,6 +45,12 @@ const config: CamelMindConfig = {
   links: {
     github: "https://github.com/conniehnguyen/camelmind",
   },
+
+  site: {
+    showLastUpdated: true,
+    showLastUpdateAuthor: true,
+    showFeedbackWidget: true,
+  },
 }
 
 export default config
