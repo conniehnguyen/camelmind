@@ -68,7 +68,9 @@ export default async function DocPage({ params }: Props) {
   const session = await getSession()
   const authEnabled = isAuthEnabled()
   const apiRefConfig = getConfig().apiReference
-  const apiRef = apiRefConfig?.enabled
+  const currentVersion = versions.find((v) => v.id === versionId)
+  const versionShowsApiRef = currentVersion ? (currentVersion.api_reference !== false) : true
+  const apiRef = apiRefConfig?.enabled && versionShowsApiRef
     ? { label: apiRefConfig.navLabel ?? "API Reference", href: "/api-reference", roles: apiRefConfig.roles ?? [] }
     : null
 

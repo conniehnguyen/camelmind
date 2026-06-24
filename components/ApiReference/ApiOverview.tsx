@@ -4,9 +4,10 @@ import { MethodBadge } from "./MethodBadge"
 
 type Props = {
   spec: ParsedSpec
+  base?: string
 }
 
-export function ApiOverview({ spec }: Props) {
+export function ApiOverview({ spec, base = "/api-reference" }: Props) {
   return (
     <div className="flex-1 px-8 py-8 max-w-4xl overflow-y-auto">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50 mb-2">{spec.info.title}</h1>
@@ -38,7 +39,7 @@ export function ApiOverview({ spec }: Props) {
               {tag.operations.map((op) => (
                 <Link
                   key={op.operationId}
-                  href={`/api-reference/${tag.slug}/${op.operationId}`}
+                  href={`${base}/${tag.slug}/${op.operationId}`}
                   className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors group"
                 >
                   <MethodBadge method={op.method} size="sm" />

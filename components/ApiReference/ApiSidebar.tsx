@@ -7,19 +7,20 @@ import { MethodBadge } from "./MethodBadge"
 type Props = {
   spec: ParsedSpec
   currentSlug: string
+  base?: string
 }
 
-export function ApiSidebar({ spec, currentSlug }: Props) {
+export function ApiSidebar({ spec, currentSlug, base = "/api-reference" }: Props) {
   return (
     <aside className="hidden md:block w-64 shrink-0 border-r border-gray-200 dark:border-gray-800 overflow-y-auto bg-white dark:bg-gray-950">
       <div className="px-4 py-4">
         {/* Overview link */}
         <div className="mb-4">
           <Link
-            href="/api-reference"
-            style={currentSlug === "/api-reference" ? { color: "var(--sf-active)" } : {}}
+            href={base}
+            style={currentSlug === base ? { color: "var(--sf-active)" } : {}}
             className={`block px-2 py-1.5 text-sm rounded transition-colors ${
-              currentSlug === "/api-reference"
+              currentSlug === base
                 ? "font-medium bg-black/5 dark:bg-white/10"
                 : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
             }`}
@@ -39,7 +40,7 @@ export function ApiSidebar({ spec, currentSlug }: Props) {
             {/* Operations */}
             <ul className="space-y-0.5">
               {tag.operations.map((op) => {
-                const href = `/api-reference/${tag.slug}/${op.operationId}`
+                const href = `${base}/${tag.slug}/${op.operationId}`
                 const isActive = currentSlug === href
 
                 return (
