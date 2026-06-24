@@ -22,6 +22,14 @@ export type SiteFeatures = {
   showFeedbackWidget?: boolean
 }
 
+export type ApiReferenceConfig = {
+  enabled: boolean
+  spec: string
+  navLabel?: string
+  languages?: string[]
+  roles?: string[]
+}
+
 export type CamelMindConfig = {
   title: string
   tagline: string
@@ -34,4 +42,5 @@ export type CamelMindConfig = {
     github?: string
   }
   site?: SiteFeatures
+  apiReference?: ApiReferenceConfig
 }

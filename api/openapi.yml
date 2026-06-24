@@ -1,0 +1,679 @@
+openapi: 3.1.0
+
+info:
+  title: Game Warden API
+  version: v1
+  description: |
+    The Game Warden API provides programmatic access to your applications,
+    body of evidence submissions, and findings management.
+
+    All API requests require authentication using a Bearer token obtained
+    from your Game Warden account settings.
+
+servers:
+  - url: https://api.gamewarden.io/v1
+    description: Production
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Applications
+    description: Create and manage your software applications in the Game Warden ecosystem.
+  - name: Body of Evidence
+    description: Build and submit your Body of Evidence (BoE) package for security authorization.
+  - name: Findings
+    description: Review security findings from automated scans and assessments, and track your remediation responses.
+
+paths:
+  /applications:
+    get:
+      tags: [Applications]
+      operationId: listApplications
+      summary: List applications
+      description: Returns a paginated list of all applications in your organization.
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          example: 1
+        - name: per_page
+          in: query
+          description: Number of results per page (max 100)
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+          example: 20
+        - name: status
+          in: query
+          description: Filter by application status
+          schema:
+            type: string
+            enum: [draft, active, under_review, approved, archived]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedApplications"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      tags: [Applications]
+      operationId: createApplication
+      summary: Create an application
+      description: Creates a new application in draft status.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateApplicationRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /applications/{applicationId}:
+    get:
+      tags: [Applications]
+      operationId: getApplication
+      summary: Get an application
+      description: Retrieves a single application by its ID.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          description: The unique application identifier
+          schema:
+            type: string
+          example: app_a1b2c3d4
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      tags: [Applications]
+      operationId: updateApplication
+      summary: Update an application
+      description: Updates a subset of fields on an existing application.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          description: The unique application identifier
+          schema:
+            type: string
+          example: app_a1b2c3d4
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateApplicationRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /applications/{applicationId}/boe:
+    get:
+      tags: [Body of Evidence]
+      operationId: getBodyOfEvidence
+      summary: Get body of evidence
+      description: Returns the current Body of Evidence package for an application, including all sections and their completion status.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          description: The unique application identifier
+          schema:
+            type: string
+          example: app_a1b2c3d4
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BodyOfEvidence"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /applications/{applicationId}/boe/sections:
+    post:
+      tags: [Body of Evidence]
+      operationId: createBoeSection
+      summary: Add a BoE section
+      description: Adds a new section to the Body of Evidence package.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          description: The unique application identifier
+          schema:
+            type: string
+          example: app_a1b2c3d4
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBoeSectionRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoeSection"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+  /applications/{applicationId}/boe/sections/{sectionId}:
+    put:
+      tags: [Body of Evidence]
+      operationId: updateBoeSection
+      summary: Update a BoE section
+      description: Replaces the content of an existing Body of Evidence section.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: app_a1b2c3d4
+        - name: sectionId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: sec_001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBoeSectionRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoeSection"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /applications/{applicationId}/boe/submit:
+    post:
+      tags: [Body of Evidence]
+      operationId: submitBodyOfEvidence
+      summary: Submit for review
+      description: |
+        Submits the completed Body of Evidence package for review by the Second Front team.
+        All required sections must be marked complete before submission.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: app_a1b2c3d4
+      responses:
+        "200":
+          description: OK — submission accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BodyOfEvidence"
+        "422":
+          description: Unprocessable Entity — incomplete sections
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+
+  /applications/{applicationId}/findings:
+    get:
+      tags: [Findings]
+      operationId: listFindings
+      summary: List findings
+      description: Returns all security findings for an application.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: app_a1b2c3d4
+        - name: severity
+          in: query
+          description: Filter by severity level
+          schema:
+            type: string
+            enum: [critical, high, medium, low, informational]
+        - name: status
+          in: query
+          description: Filter by remediation status
+          schema:
+            type: string
+            enum: [open, in_remediation, remediated, accepted, closed]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Finding"
+                  total:
+                    type: integer
+                    example: 7
+
+  /applications/{applicationId}/findings/{findingId}:
+    get:
+      tags: [Findings]
+      operationId: getFinding
+      summary: Get a finding
+      description: Retrieves a single finding with its full details and any existing responses.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: app_a1b2c3d4
+        - name: findingId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: find_abc123
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FindingDetail"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /applications/{applicationId}/findings/{findingId}/responses:
+    post:
+      tags: [Findings]
+      operationId: addFindingResponse
+      summary: Add a response
+      description: |
+        Adds a vendor response to a finding. Use this to describe remediation steps taken,
+        provide evidence of fixes, or formally accept a risk.
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: app_a1b2c3d4
+        - name: findingId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: find_abc123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFindingResponseRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FindingResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token from your Game Warden account settings
+
+  schemas:
+    Application:
+      type: object
+      required: [id, name, status, created_at]
+      properties:
+        id:
+          type: string
+          description: Unique application identifier
+          example: app_a1b2c3d4
+        name:
+          type: string
+          description: Human-readable application name
+          example: My Secure Application
+        description:
+          type: string
+          description: Optional description of the application
+          example: A cloud-native service for secure data processing
+        type:
+          type: string
+          enum: [webapp, service, mobile, desktop, other]
+          description: Application type
+          example: service
+        status:
+          type: string
+          enum: [draft, active, under_review, approved, archived]
+          description: Current lifecycle status
+          example: active
+        created_at:
+          type: string
+          format: date-time
+          description: When the application was created
+          example: "2024-01-15T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: When the application was last updated
+          example: "2024-03-20T14:45:00Z"
+
+    CreateApplicationRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          description: Human-readable application name
+          example: My Secure Application
+        description:
+          type: string
+          description: Optional description of the application
+          example: A cloud-native service for secure data processing
+        type:
+          type: string
+          enum: [webapp, service, mobile, desktop, other]
+          description: Application type
+          example: service
+
+    UpdateApplicationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: My Secure Application (Renamed)
+        description:
+          type: string
+          example: Updated description
+
+    PaginatedApplications:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Application"
+        total:
+          type: integer
+          description: Total number of applications
+          example: 12
+        page:
+          type: integer
+          description: Current page number
+          example: 1
+        per_page:
+          type: integer
+          description: Results per page
+          example: 20
+
+    BodyOfEvidence:
+      type: object
+      required: [id, application_id, status]
+      properties:
+        id:
+          type: string
+          example: boe_x1y2z3
+        application_id:
+          type: string
+          example: app_a1b2c3d4
+        status:
+          type: string
+          enum: [in_progress, submitted, under_review, approved, rejected]
+          example: in_progress
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/BoeSection"
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+
+    BoeSection:
+      type: object
+      required: [id, title, status]
+      properties:
+        id:
+          type: string
+          example: sec_001
+        title:
+          type: string
+          example: System Description
+        description:
+          type: string
+          description: Guidance text for completing this section
+          example: Provide a high-level description of the system architecture
+        status:
+          type: string
+          enum: [not_started, in_progress, complete]
+          example: in_progress
+        content:
+          type: string
+          description: Markdown content for this section
+          example: "## Overview\n\nThis system processes encrypted telemetry data..."
+
+    CreateBoeSectionRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          example: System Description
+        description:
+          type: string
+          example: Provide a high-level description of the system architecture
+        content:
+          type: string
+          example: "## Overview\n\nThis system..."
+
+    UpdateBoeSectionRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: System Description (Updated)
+        content:
+          type: string
+          example: "## Overview\n\nThis system processes encrypted telemetry data..."
+        status:
+          type: string
+          enum: [not_started, in_progress, complete]
+          example: complete
+
+    Finding:
+      type: object
+      required: [id, title, severity, status, created_at]
+      properties:
+        id:
+          type: string
+          example: find_abc123
+        title:
+          type: string
+          example: Unencrypted data at rest
+        description:
+          type: string
+          example: The database volume does not use encryption at rest, exposing sensitive data.
+        severity:
+          type: string
+          enum: [critical, high, medium, low, informational]
+          example: high
+        status:
+          type: string
+          enum: [open, in_remediation, remediated, accepted, closed]
+          example: open
+        rule_id:
+          type: string
+          description: Identifier of the scan rule that generated this finding
+          example: CKV_AWS_17
+        resource:
+          type: string
+          description: The affected cloud resource
+          example: aws_db_instance.primary
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-02-10T08:00:00Z"
+
+    FindingDetail:
+      allOf:
+        - $ref: "#/components/schemas/Finding"
+        - type: object
+          properties:
+            responses:
+              type: array
+              items:
+                $ref: "#/components/schemas/FindingResponse"
+
+    FindingResponse:
+      type: object
+      required: [id, content, created_at]
+      properties:
+        id:
+          type: string
+          example: resp_001
+        content:
+          type: string
+          example: We have enabled AES-256 encryption on the RDS instance. See attached screenshot for confirmation.
+        action:
+          type: string
+          enum: [remediated, accepted_risk, false_positive, needs_info]
+          example: remediated
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-02-15T11:00:00Z"
+
+    CreateFindingResponseRequest:
+      type: object
+      required: [content, action]
+      properties:
+        content:
+          type: string
+          description: Detailed description of the response or remediation taken
+          example: We have enabled AES-256 encryption on the RDS instance.
+        action:
+          type: string
+          enum: [remediated, accepted_risk, false_positive, needs_info]
+          description: The type of response
+          example: remediated
+
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          example: not_found
+        message:
+          type: string
+          example: The requested resource was not found
+
+    ValidationError:
+      type: object
+      required: [error, message, details]
+      properties:
+        error:
+          type: string
+          example: validation_error
+        message:
+          type: string
+          example: One or more fields are invalid
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: name
+              message:
+                type: string
+                example: Name is required
