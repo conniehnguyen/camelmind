@@ -80,6 +80,66 @@ See the [Configuration Reference](/reference/configuration) for all options.
 
 ---
 
+## API Reference (Optional)
+
+CamelMind can render an interactive API reference from an OpenAPI 3.x spec alongside your documentation.
+
+### Enable it
+
+Add `apiReference` to `camelmind.config.ts`:
+
+```typescript
+export default {
+  title: "My Docs",
+  apiReference: {
+    enabled: true,
+    spec: "api/openapi.yml",       // path to your OpenAPI spec (relative to project root)
+    navLabel: "API Reference",     // label shown in the top nav
+    languages: ["curl", "python", "javascript", "go"],  // code sample languages
+    roles: [],                     // [] = anyone logged in; ["admin"] = role-gated
+  },
+}
+```
+
+Place your spec file at the path you set (e.g. `api/openapi.yml`). The API Reference will appear in the top nav and be served at `/api-reference`.
+
+### Per-version specs
+
+If you have multiple doc versions, each version can point to its own OpenAPI spec via `versions.yml`:
+
+```yaml
+versions:
+  - id: "v2.0"
+    label: "v2.0 (Latest)"
+    stable: true
+    nav: nav/nav-v2.0.yml
+    api_reference:
+      spec: api/openapi-v2.0.yml        # version-specific spec
+
+  - id: "v1.9"
+    label: "v1.9"
+    stable: true
+    nav: nav/nav-v1.9.yml
+    api_reference:
+      spec: api/openapi-v1.9.yml
+
+  - id: "dev"
+    label: "dev"
+    stable: false
+    nav: nav/nav-dev.yml
+    api_reference: false                # hide API Reference for this version
+```
+
+| `api_reference` value | Behavior |
+|---|---|
+| omitted | Uses the site-level spec from `camelmind.config.ts` |
+| `false` | Hides the API Reference link; URL returns 404 |
+| `{ spec: "..." }` | Loads a version-specific OpenAPI spec |
+
+Versioned API Reference is served at `/api-reference/<version>/tag/operationId` (e.g. `/api-reference/v2.0/applications/create`).
+
+---
+
 ## Authentication (Optional)
 
 Auth is **disabled by default**. When enabled, CamelMind supports:

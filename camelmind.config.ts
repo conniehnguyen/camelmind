@@ -51,6 +51,14 @@ const config: CamelMindConfig = {
     showLastUpdateAuthor: true,
     showFeedbackWidget: true,
   },
+
+  apiReference: {
+    enabled: true,
+    spec: "api/openapi.yml",
+    navLabel: "API Reference",
+    languages: ["curl", "python", "javascript", "go"],
+    roles: [],
+  },
 }
 
 export default config

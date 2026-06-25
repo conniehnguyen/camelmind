@@ -3,3 +3,4 @@ versions:
     label: "Latest"
     stable: true
     nav: nav/nav.yml
+    api_reference: true

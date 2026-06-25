@@ -19,9 +19,10 @@ type Props = {
   currentVersionId: string | null
   currentSlug: string
   versionSlugs: Record<string, string[]>
+  apiRef?: { label: string; href: string; roles: string[] } | null
 }
 
-export function TopNav({ nav, userRoles, userName, authEnabled = false, versions, currentVersionId, currentSlug, versionSlugs }: Props) {
+export function TopNav({ nav, userRoles, userName, authEnabled = false, versions, currentVersionId, currentSlug, versionSlugs, apiRef }: Props) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const navRef = useRef<HTMLElement>(null)
@@ -107,6 +108,18 @@ export function TopNav({ nav, userRoles, userName, authEnabled = false, versions
             )
           })}
         </div>
+
+        {/* API Reference link */}
+        {apiRef && (apiRef.roles.length === 0 || apiRef.roles.some((r) => userRoles.includes(r))) && (
+          <Link
+            href={apiRef.href}
+            className={`hidden md:block text-sm font-medium transition-colors ${
+              currentSlug.startsWith("/api-reference") ? "text-[var(--cm-oasis-teal)]" : "text-[var(--cm-parchment)] hover:text-[var(--cm-oasis-teal)]"
+            }`}
+          >
+            {apiRef.label}
+          </Link>
+        )}
 
         {/* Right side */}
         <div className="ml-auto flex items-center gap-3">
