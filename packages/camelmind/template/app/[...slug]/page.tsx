@@ -12,7 +12,7 @@ import {
 } from "@/lib/nav"
 import { loadMdxFile } from "@/lib/mdx"
 import { getSession, hasAccess, pageRequiresAuth, shouldRedirectToLogin } from "@/lib/auth"
-import { isAuthEnabled } from "@/lib/config"
+import { getConfig, isAuthEnabled, showLastUpdated, showLastUpdateAuthor, showFeedbackWidget } from "@/lib/config"
 import { loadVersions, getVersionFromSlug, getNavForVersion } from "@/lib/versions"
 import { TopNav } from "@/components/Nav/TopNav"
 import { Sidebar } from "@/components/Sidebar/Sidebar"
@@ -21,6 +21,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs/Breadcrumbs"
 import { PageNav } from "@/components/PageNav/PageNav"
 import { SectionCards } from "@/components/SectionCards/SectionCards"
 import { DocActions } from "@/components/DocActions/DocActions"
+import { LastUpdated } from "@/components/LastUpdated/LastUpdated"
+import { DocFeedback } from "@/components/DocFeedback/DocFeedback"
 import { ZoomImages } from "@/components/ZoomImages/ZoomImages"
 import { mdxComponents } from "@/components/mdx"
 import type { NavGroup, NavEntry } from "@/lib/nav-types"
@@ -65,6 +67,12 @@ export default async function DocPage({ params }: Props) {
 
   const session = await getSession()
   const authEnabled = isAuthEnabled()
+  const apiRefConfig = getConfig().apiReference
+  const currentVersion = versions.find((v) => v.id === versionId)
+  const versionShowsApiRef = currentVersion ? (currentVersion.api_reference !== false) : true
+  const apiRef = apiRefConfig?.enabled && versionShowsApiRef
+    ? { label: apiRefConfig.navLabel ?? "API Reference", href: "/api-reference", roles: apiRefConfig.roles ?? [] }
+    : null
 
   if (shouldRedirectToLogin(navEntry.roles, session)) {
     redirect(`/login?returnTo=${encodeURIComponent(fullSlug)}`)
@@ -73,7 +81,7 @@ export default async function DocPage({ params }: Props) {
   if (pageRequiresAuth(navEntry.roles) && session && !hasAccess(navEntry.roles, session.roles)) {
     return (
       <div className="flex flex-col h-screen">
-        <TopNav nav={nav.nav} userRoles={session.roles} userName={session.name} authEnabled={authEnabled} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} />
+        <TopNav nav={nav.nav} userRoles={session.roles} userName={session.name} authEnabled={authEnabled} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} apiRef={apiRef} />
         <div className="flex flex-1 items-center justify-center bg-[var(--cm-bg-primary)]">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-[var(--cm-text-primary)] mb-2">Access Restricted</h1>
@@ -89,12 +97,12 @@ export default async function DocPage({ params }: Props) {
 
   const activeGroup = getGroupForSlugFromConfig(nav, fullSlug) as NavGroup | null
   const sectionEntry = getSectionForSlugFromConfig(nav, fullSlug) as NavEntry | null
-  const { frontmatter, source, toc } = loadMdxFile(navEntry.file)
+  const { frontmatter, source, toc, lastUpdated, lastUpdatedAuthor } = loadMdxFile(navEntry.file)
   const isSectionRoot = sectionEntry?.slug === fullSlug
 
   return (
     <div className="flex flex-col h-screen">
-      <TopNav nav={nav.nav} userRoles={session?.roles ?? []} userName={session?.name ?? null} authEnabled={authEnabled} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} />
+      <TopNav nav={nav.nav} userRoles={session?.roles ?? []} userName={session?.name ?? null} authEnabled={authEnabled} versions={versions} currentVersionId={versionId} currentSlug={fullSlug} versionSlugs={versionSlugs} apiRef={apiRef} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar activeGroup={activeGroup} currentSlug={fullSlug} userRoles={session?.roles ?? []} authEnabled={authEnabled} />
         <main className="flex-1 overflow-y-auto bg-white dark:bg-gray-950">
@@ -137,7 +145,21 @@ export default async function DocPage({ params }: Props) {
                   <SectionCards entry={sectionEntry} />
                 </div>
               )}
-              <div data-print="hide">
+              <div data-print="hide" className="mt-12">
+                <div className="flex items-center justify-between mb-6">
+                  {showLastUpdated() && lastUpdated ? (
+                    <LastUpdated
+                      date={lastUpdated}
+                      author={showLastUpdateAuthor() ? lastUpdatedAuthor : null}
+                    />
+                  ) : <div />}
+                  {showFeedbackWidget() && (
+                    <DocFeedback
+                      pageTitle={frontmatter.title}
+                      pageSlug={fullSlug}
+                    />
+                  )}
+                </div>
                 <PageNav activeGroup={activeGroup} currentSlug={fullSlug} />
               </div>
             </article>

@@ -61,6 +61,11 @@ export default async function HomePage() {
     versions.map((v) => [v.id, getSlugsFromConfig(getNavForVersion(v.id))])
   )
 
+  const apiRefConfig = config.apiReference
+  const apiRef = apiRefConfig?.enabled
+    ? { label: apiRefConfig.navLabel ?? "API Reference", href: "/api-reference", roles: apiRefConfig.roles ?? [] }
+    : null
+
   return (
     <div className="flex flex-col min-h-screen">
       <TopNav
@@ -72,6 +77,7 @@ export default async function HomePage() {
         currentVersionId={null}
         currentSlug="/home"
         versionSlugs={versionSlugs}
+        apiRef={apiRef}
       />
 
       <main className="flex-1 bg-[var(--cm-bg-primary)]">
