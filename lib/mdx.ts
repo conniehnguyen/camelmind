@@ -44,6 +44,19 @@ function extractToc(source: string): TocEntry[] {
   return entries
 }
 
+export function processForLLM(source: string): string {
+  let result = source.replace(/<LLMIgnore>[\s\S]*?<\/LLMIgnore>/g, "")
+  result = result.replace(/<LLMOnly>([\s\S]*?)<\/LLMOnly>/g, "$1")
+  return result.replace(/\n{3,}/g, "\n\n").trim()
+}
+
+export function loadFrontmatterOnly(filePath: string): FrontMatter {
+  const fullPath = path.join(process.cwd(), filePath)
+  const raw = fs.readFileSync(fullPath, "utf-8")
+  const { data } = matter(raw)
+  return data as FrontMatter
+}
+
 export function loadMdxFile(filePath: string): DocContent {
   const fullPath = path.join(process.cwd(), filePath)
   const raw = fs.readFileSync(fullPath, "utf-8")

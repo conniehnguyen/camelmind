@@ -1,7 +1,7 @@
 import siteConfig from "@/camelmind.config"
 import type { AuthConfig, CamelMindConfig } from "./config-types"
 
-export type { AuthConfig, AuthProvider, CamelMindConfig, OidcConfig } from "./config-types"
+export type { AuthConfig, AuthProvider, CamelMindConfig, LlmsConfig, OidcConfig } from "./config-types"
 
 let _config: CamelMindConfig | null = null
 
