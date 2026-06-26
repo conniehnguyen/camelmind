@@ -54,7 +54,9 @@ const config: CamelMindConfig = {
 
   apiReference: {
     enabled: true,
-    spec: "api/openapi.yml",
+    specs: {
+      "main-api": { label: "Main API", file: "api/openapi.yml" },
+    },
     navLabel: "API Reference",
     languages: ["curl", "python", "javascript", "go"],
     roles: [],

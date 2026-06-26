@@ -15,22 +15,21 @@ import type {
   HttpMethod,
 } from "./api-types"
 
-let _cache: ParsedSpec | null = null
-let _cachedLanguages: string | null = null
+const _specCache = new Map<string, ParsedSpec>()
 
 export function loadApiSpec(specPath: string, languages?: string[]): ParsedSpec {
-  const langKey = JSON.stringify(languages ?? null)
-  if (_cache && _cachedLanguages === langKey) return _cache
+  const cacheKey = `${specPath}|${JSON.stringify(languages ?? null)}`
+  const cached = _specCache.get(cacheKey)
+  if (cached) return cached
   const raw = fs.readFileSync(path.join(process.cwd(), specPath), "utf-8")
   const doc = yaml.load(raw) as Record<string, unknown>
-  _cache = parseOpenApi(doc, languages)
-  _cachedLanguages = langKey
-  return _cache
+  const parsed = parseOpenApi(doc, languages)
+  _specCache.set(cacheKey, parsed)
+  return parsed
 }
 
 export function clearApiCache() {
-  _cache = null
-  _cachedLanguages = null
+  _specCache.clear()
 }
 
 function slugify(str: string): string {

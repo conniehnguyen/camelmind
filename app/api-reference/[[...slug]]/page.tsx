@@ -2,7 +2,8 @@ import { notFound, redirect } from "next/navigation"
 import { getConfig, isAuthEnabled } from "@/lib/config"
 import { loadApiSpec } from "@/lib/api-reference"
 import { getSession, hasAccess } from "@/lib/auth"
-import { loadVersions, getNavForVersion, getApiSpecForVersion } from "@/lib/versions"
+import { loadVersions, getNavForVersion, getApiReferenceForVersion } from "@/lib/versions"
+import type { ResolvedTab } from "@/lib/versions"
 import { getSlugsFromConfig } from "@/lib/nav"
 import { TopNav } from "@/components/Nav/TopNav"
 import { ApiSidebar } from "@/components/ApiReference/ApiSidebar"
@@ -13,9 +14,6 @@ type Props = {
   params: Promise<{ slug?: string[] }>
 }
 
-// Detect if the first slug segment is a known version ID.
-// /api-reference/v2.0/applications/create → versionId="v2.0", rest=["applications","create"]
-// /api-reference/applications/create      → versionId=null,   rest=["applications","create"]
 function parseVersionFromSlug(
   slug: string[] | undefined,
   versionIds: string[]
@@ -36,24 +34,37 @@ export async function generateStaticParams() {
   const params: Array<{ slug: string[] | undefined }> = [{ slug: undefined }]
 
   for (const version of versions) {
-    const resolved = getApiSpecForVersion(version.id, apiRef.spec, apiRef.languages)
+    const resolved = getApiReferenceForVersion(version.id, apiRef)
     if (!resolved) continue
-
-    let spec
-    try { spec = loadApiSpec(resolved.spec, resolved.languages) } catch { continue }
 
     params.push({ slug: [version.id] })
 
-    for (const op of spec.allOperations) {
-      params.push({ slug: [version.id, op.tagSlug, op.operationId] })
+    if (resolved.mode === "single") {
+      let spec
+      try { spec = loadApiSpec(resolved.file, resolved.languages) } catch { continue }
+      for (const op of spec.allOperations) {
+        params.push({ slug: [version.id, op.tagSlug, op.operationId] })
+      }
+    } else {
+      for (const tab of resolved.tabs) {
+        params.push({ slug: [version.id, tab.id] })
+        let spec
+        try { spec = loadApiSpec(tab.file, tab.languages) } catch { continue }
+        for (const op of spec.allOperations) {
+          params.push({ slug: [version.id, tab.id, op.tagSlug, op.operationId] })
+        }
+      }
     }
   }
 
-  // Also enumerate no-version-prefix routes using the default spec
-  let defaultSpec
-  try { defaultSpec = loadApiSpec(apiRef.spec, apiRef.languages) } catch { return params }
-  for (const op of defaultSpec.allOperations) {
-    params.push({ slug: [op.tagSlug, op.operationId] })
+  // No-version-prefix routes using the default (first) spec
+  const defaultResolved = getApiReferenceForVersion(null, apiRef)
+  if (defaultResolved?.mode === "single") {
+    let defaultSpec
+    try { defaultSpec = loadApiSpec(defaultResolved.file, defaultResolved.languages) } catch { return params }
+    for (const op of defaultSpec.allOperations) {
+      params.push({ slug: [op.tagSlug, op.operationId] })
+    }
   }
 
   return params
@@ -68,14 +79,37 @@ export default async function ApiReferencePage({ params }: Props) {
   const { versions } = loadVersions()
   const versionIds = versions.map((v) => v.id)
 
-  const { versionId, rest: slug } = parseVersionFromSlug(rawSlug, versionIds)
-  const base = versionId ? `/api-reference/${versionId}` : "/api-reference"
+  const { versionId, rest: afterVersion } = parseVersionFromSlug(rawSlug, versionIds)
 
-  const resolved = getApiSpecForVersion(versionId, apiRef.spec, apiRef.languages)
+  const resolved = getApiReferenceForVersion(versionId, apiRef)
   if (!resolved) return notFound()
 
+  // Resolve active tab and remaining slug segments
+  let activeTab: ResolvedTab | null = null
+  let slug: string[]
+
+  if (resolved.mode === "tabs") {
+    const tabIds = resolved.tabs.map((t) => t.id)
+    if (afterVersion.length && tabIds.includes(afterVersion[0])) {
+      activeTab = resolved.tabs.find((t) => t.id === afterVersion[0])!
+      slug = afterVersion.slice(1)
+    } else {
+      const versionBase = versionId ? `/api-reference/${versionId}` : "/api-reference"
+      redirect(`${versionBase}/${resolved.tabs[0].id}`)
+    }
+  } else {
+    slug = afterVersion
+  }
+
+  // Load spec for current tab or single spec
+  const specFile = resolved.mode === "tabs" ? activeTab!.file : resolved.file
+  const specLanguages = resolved.mode === "tabs" ? activeTab!.languages : resolved.languages
   let spec
-  try { spec = loadApiSpec(resolved.spec, resolved.languages) } catch { return notFound() }
+  try { spec = loadApiSpec(specFile, specLanguages) } catch { return notFound() }
+
+  // Base URL: /api-reference[/versionId][/tabId]
+  const versionBase = versionId ? `/api-reference/${versionId}` : "/api-reference"
+  const base = resolved.mode === "tabs" ? `${versionBase}/${activeTab!.id}` : versionBase
 
   const session = await getSession()
   const authEnabled = isAuthEnabled()
@@ -105,6 +139,13 @@ export default async function ApiReferencePage({ params }: Props) {
   const apiRefProp = { label: apiRef.navLabel ?? "API Reference", href: "/api-reference", roles }
   const currentSlug = slug.length ? `${base}/${slug.join("/")}` : base
 
+  // Tab switcher props for sidebar
+  const sidebarTabs = resolved.mode === "tabs"
+    ? resolved.tabs.map((t) => ({ id: t.id, label: t.label, href: `${versionBase}/${t.id}` }))
+    : undefined
+  const activeTabId = activeTab?.id
+
+  // Overview page
   if (!slug.length) {
     return (
       <div className="flex flex-col h-screen">
@@ -115,12 +156,12 @@ export default async function ApiReferencePage({ params }: Props) {
           authEnabled={authEnabled}
           versions={versions}
           currentVersionId={versionId}
-          currentSlug={base}
+          currentSlug={versionBase}
           versionSlugs={versionSlugs}
           apiRef={apiRefProp}
         />
         <div className="flex flex-1 overflow-hidden">
-          <ApiSidebar spec={spec} currentSlug={base} base={base} />
+          <ApiSidebar spec={spec} currentSlug={base} base={base} tabs={sidebarTabs} activeTabId={activeTabId} />
           <main className="flex-1 overflow-y-auto bg-white dark:bg-gray-950">
             <ApiOverview spec={spec} base={base} />
           </main>
@@ -129,12 +170,14 @@ export default async function ApiReferencePage({ params }: Props) {
     )
   }
 
+  // Tag-only slug → redirect to first endpoint
   if (slug.length === 1) {
     const tag = spec.tags.find((t) => t.slug === slug[0])
     if (!tag || !tag.operations.length) return notFound()
     redirect(`${base}/${tag.slug}/${tag.operations[0].operationId}`)
   }
 
+  // Endpoint page
   const [tagSlug, operationId] = slug
   const op = spec.allOperations.find(
     (o) => o.tagSlug === tagSlug && o.operationId === operationId
@@ -155,7 +198,7 @@ export default async function ApiReferencePage({ params }: Props) {
         apiRef={apiRefProp}
       />
       <div className="flex flex-1 overflow-hidden">
-        <ApiSidebar spec={spec} currentSlug={currentSlug} base={base} />
+        <ApiSidebar spec={spec} currentSlug={currentSlug} base={base} tabs={sidebarTabs} activeTabId={activeTabId} />
         <main className="flex-1 overflow-hidden bg-white dark:bg-gray-950 flex">
           <EndpointPage operation={op} spec={spec} />
         </main>

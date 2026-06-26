@@ -22,9 +22,14 @@ export type SiteFeatures = {
   showFeedbackWidget?: boolean
 }
 
+export type ApiSpecEntry = {
+  label: string
+  file: string
+}
+
 export type ApiReferenceConfig = {
   enabled: boolean
-  spec: string
+  specs: Record<string, ApiSpecEntry>
   navLabel?: string
   languages?: string[]
   roles?: string[]
