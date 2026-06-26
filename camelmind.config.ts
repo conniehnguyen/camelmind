@@ -39,7 +39,7 @@ const config: CamelMindConfig = {
       roleMapping: {},
     },
 
-    publicPaths: ["/", "/home", "/login", "/api/auth"],
+    publicPaths: ["/", "/home", "/login", "/api/auth", "/api/llms", "/llms.txt"],
   },
 
   links: {
@@ -58,6 +58,11 @@ const config: CamelMindConfig = {
     navLabel: "API Reference",
     languages: ["curl", "python", "javascript", "go"],
     roles: [],
+  },
+
+  llms: {
+    enabled: true,
+    directive: "For a complete documentation index, see /llms.txt. To read any public page as Markdown, append .md to the URL.",
   },
 }
 

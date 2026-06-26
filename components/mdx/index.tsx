@@ -3,6 +3,8 @@ import { Steps, Step } from "./Steps"
 import { Tabs, Tab } from "./Tabs"
 import { Icon } from "./Icon"
 import { Details } from "./Details"
+import { LLMOnly } from "./LLMOnly"
+import { LLMIgnore } from "./LLMIgnore"
 import { CodeBlock } from "@/components/Code/CodeBlock"
 
 export const mdxComponents = {
@@ -13,6 +15,8 @@ export const mdxComponents = {
   Tab,
   Icon,
   Details,
+  LLMOnly,
+  LLMIgnore,
   pre: ({ children }: { children: React.ReactNode }) => {
     // If the child code block has a language class, let CodeBlock handle it
     const child = children as React.ReactElement<{ className?: string }>

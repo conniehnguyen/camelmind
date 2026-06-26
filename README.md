@@ -142,6 +142,62 @@ Versioned API Reference is served at `/api-reference/<version>/tag/operationId` 
 
 ---
 
+## LLM-Friendly Docs (Optional)
+
+CamelMind can serve your documentation to AI tools like ChatGPT, Claude, and Cursor via the [llms.txt standard](https://llmstxt.org/).
+
+### Enable it
+
+Add `llms` to `camelmind.config.ts`:
+
+```typescript
+export default {
+  title: "My Docs",
+  llms: {
+    enabled: true,
+    directive: "For a complete documentation index, see /llms.txt. To read any public page as Markdown, append .md to the URL.",
+  },
+}
+```
+
+### What gets generated
+
+| Endpoint | What it returns |
+|---|---|
+| `/llms.txt` | Index of all public pages with titles and descriptions |
+| `/<slug>.md` | Raw Markdown of that page with the agent directive prepended |
+
+Only pages with `roles: []` in `nav.yml` are included. Role-restricted pages return `401` and are never listed in `/llms.txt` — non-customers can't extract private content by asking an LLM.
+
+### Control what LLMs see per block
+
+Use `<LLMOnly>` and `<LLMIgnore>` tags inside any MDX file to show different content to AI vs. human readers:
+
+| Tag | Browser | `.md` response |
+|---|---|---|
+| `<LLMOnly>` | Hidden | Included |
+| `<LLMIgnore>` | Visible | Stripped |
+
+```mdx
+Follow these steps to create an environment:
+
+<LLMIgnore>
+1. Navigate to App Central and click **New Environment**.
+2. Fill in the form and click **Submit**.
+</LLMIgnore>
+
+<LLMOnly>
+Use the CLI:
+```bash
+cm env create --name my-env
+```
+</LLMOnly>
+```
+
+Humans see the click-through steps. LLMs see the CLI command. Both tags are available in every MDX file — no imports needed.
+
+---
+
 ## Authentication (Optional)
 
 Auth is **disabled by default**. When enabled, CamelMind supports:

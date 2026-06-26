@@ -6,6 +6,14 @@ import { isAuthEnabled, isPrivateSite, isPublicPath } from "@/lib/config"
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
+  // Rewrite /<slug>.md to /api/llms/<slug> before auth runs.
+  // /api/llms is in publicPaths so the handler is always reachable.
+  if (pathname.endsWith(".md") && !pathname.startsWith("/api/")) {
+    const url = req.nextUrl.clone()
+    url.pathname = `/api/llms${pathname.slice(0, -3)}`
+    return NextResponse.rewrite(url)
+  }
+
   // Auth disabled — all traffic passes through
   if (!isAuthEnabled()) {
     return NextResponse.next()

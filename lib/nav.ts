@@ -123,3 +123,24 @@ export function getSectionForSlugFromConfig(nav: NavConfig, slug: string): NavEn
 export function getSectionForSlug(slug: string): NavEntry | null {
   return getSectionForSlugFromConfig(loadNav(), slug)
 }
+
+export function getAllPublicEntries(nav: NavConfig): (NavEntry | NavChild)[] {
+  const entries: (NavEntry | NavChild)[] = []
+  for (const item of nav.nav) {
+    if ("dropdown" in item) {
+      const group = item as NavGroup
+      for (const entry of (group.items ?? [])) {
+        if (entry.roles.length === 0) entries.push(entry)
+        if (entry.section) {
+          for (const child of flattenChildren(entry.section)) {
+            if (child.roles.length === 0) entries.push(child)
+          }
+        }
+      }
+    } else if ("slug" in item) {
+      const entry = item as NavEntry
+      if (entry.roles.length === 0) entries.push(entry)
+    }
+  }
+  return entries
+}
