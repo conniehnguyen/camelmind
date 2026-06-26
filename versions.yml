@@ -3,4 +3,16 @@ versions:
     label: "Latest"
     stable: true
     nav: nav/nav.yml
-    api_reference: true
+    api_reference:
+      spec: main-api
+
+  - id: "v2"
+    label: "v2"
+    stable: true
+    nav: nav/nav-v2.yml
+    api_reference:
+      tabs:
+        - id: main
+          spec: main-api
+        - id: partner
+          spec: partner-api
