@@ -11,6 +11,7 @@ const pkgPath = path.join(__dirname, "../package.json")
 const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"))
 
 import { init } from "./commands/init.js"
+import { checkVersion } from "./commands/version.js"
 
 const program = new Command()
 
@@ -24,5 +25,10 @@ program
   .description("Create a new CamelMind documentation site")
   .option("--no-install", "Skip installing npm dependencies")
   .action(init)
+
+program
+  .command("version")
+  .description("Show installed version and check for updates")
+  .action(() => checkVersion(pkg.version))
 
 program.parse()

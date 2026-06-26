@@ -135,6 +135,45 @@ async function init(projectName, options) {
 `);
 }
 
+// src/commands/version.ts
+import chalk2 from "chalk";
+import ora2 from "ora";
+async function checkVersion(currentVersion) {
+  const spinner = ora2("Checking latest version...").start();
+  let latestVersion;
+  try {
+    const res = await fetch("https://registry.npmjs.org/camelmind/latest");
+    if (!res.ok) throw new Error(`Registry responded with ${res.status}`);
+    const data = await res.json();
+    latestVersion = data.version;
+    spinner.stop();
+  } catch {
+    spinner.fail("Could not reach the npm registry");
+    console.log(`
+  Installed: ${chalk2.cyan(currentVersion)}
+`);
+    return;
+  }
+  const [curMajor, curMinor, curPatch] = currentVersion.split(".").map(Number);
+  const [latMajor, latMinor, latPatch] = latestVersion.split(".").map(Number);
+  const isOutdated = latMajor > curMajor || latMajor === curMajor && latMinor > curMinor || latMajor === curMajor && latMinor === curMinor && latPatch > curPatch;
+  console.log(`
+  Installed  ${chalk2.cyan(currentVersion)}
+  Latest     ${isOutdated ? chalk2.yellow(latestVersion) : chalk2.green(latestVersion)}
+`);
+  if (isOutdated) {
+    console.log(
+      `  ${chalk2.yellow("\u26A0")}  A new version is available. Run:
+
+    ${chalk2.cyan("npm install -g camelmind@latest")}
+`
+    );
+  } else {
+    console.log(`  ${chalk2.green("\u2713")}  You're up to date.
+`);
+  }
+}
+
 // src/index.ts
 var __dirname2 = path2.dirname(fileURLToPath2(import.meta.url));
 var pkgPath = path2.join(__dirname2, "../package.json");
@@ -142,4 +181,5 @@ var pkg = JSON.parse(fs2.readFileSync(pkgPath, "utf-8"));
 var program = new Command();
 program.name("camelmind").description("CamelMind CLI \u2014 scaffold and manage documentation sites").version(pkg.version);
 program.command("init [project-name]").description("Create a new CamelMind documentation site").option("--no-install", "Skip installing npm dependencies").action(init);
+program.command("version").description("Show installed version and check for updates").action(() => checkVersion(pkg.version));
 program.parse();

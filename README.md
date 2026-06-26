@@ -40,9 +40,11 @@ Open [http://localhost:3000](http://localhost:3000).
 ### CLI options
 
 ```bash
-npx camelmind init my-docs          # scaffold + npm install
-npx camelmind init my-docs --no-install   # scaffold only
-npx camelmind --help                # all commands
+npx camelmind init my-docs               # scaffold + npm install
+npx camelmind init my-docs --no-install  # scaffold only, skip npm install
+npx camelmind version                    # show installed version + check for updates
+npx camelmind --version                  # print version number and exit
+npx camelmind --help                     # list all commands
 ```
 
 ---
