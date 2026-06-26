@@ -1,7 +1,7 @@
 openapi: 3.1.0
 
 info:
-  title: Camel Partner Network API
+  title: Partner Network
   version: v2
   description: |
     The Camel Partner Network API lets certified trade partners query shared
