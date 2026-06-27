@@ -13,6 +13,9 @@ import { SignJWT } from "jose"
 import fs from "fs"
 import path from "path"
 import yaml from "js-yaml"
+import config from "../camelmind.config"
+
+const SITE_TITLE = config.title
 
 const ROOT = path.resolve(process.cwd())
 const NAV_FILE = path.join(ROOT, "nav", "nav.yml")
@@ -113,7 +116,7 @@ async function generatePage(
       headerTemplate: `
         <div style="width:100%;font-family:system-ui,sans-serif;font-size:8px;color:#6b7280;display:flex;justify-content:space-between;padding:0 16mm;">
           <span>${page.group}${page.section ? " › " + page.section : ""}</span>
-          <span style="color:#111827;font-weight:600;">Game Warden Help Center</span>
+          <span style="color:#111827;font-weight:600;">${SITE_TITLE}</span>
         </div>`,
       footerTemplate: `
         <div style="width:100%;font-family:system-ui,sans-serif;font-size:8px;color:#6b7280;display:flex;justify-content:space-between;padding:0 16mm;">

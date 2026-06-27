@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-VERSION=${1:-v2.0}
+VERSION=${1:-latest}
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT_DIR="$ROOT/out"
 BUILDS_DIR="$ROOT/offline-builds"

@@ -9,7 +9,7 @@
 
 set -euo pipefail
 
-VERSION=${1:-v2.0}
+VERSION=${1:-latest}
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PAGES_DIR="$ROOT/.pdf-pages"
 PORT=3000
