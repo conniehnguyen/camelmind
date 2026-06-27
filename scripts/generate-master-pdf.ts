@@ -247,7 +247,7 @@ async function main() {
 
   // ── Write output ───────────────────────────────────────────────────────────
   fs.mkdirSync(OUT_DIR, { recursive: true })
-  const outFile = path.join(OUT_DIR, `Game-Warden-Help-Center-${VERSION}.pdf`)
+  const outFile = path.join(OUT_DIR, `camelmind-${VERSION}.pdf`)
   const pdfBytes = await masterDoc.save()
   fs.writeFileSync(outFile, pdfBytes)
 

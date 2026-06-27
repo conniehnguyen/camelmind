@@ -21,6 +21,8 @@ const PORT = parseInt(process.argv.find((a) => a.startsWith("--port="))?.split("
 const OUT_DIR = process.argv.find((a) => a.startsWith("--out="))?.split("=")[1]
   ? path.resolve(process.argv.find((a) => a.startsWith("--out="))!.split("=")[1])
   : path.join(ROOT, ".pdf-pages")
+// --no-auth: skip the login step (use when rendering a static offline export where auth is bypassed)
+const SKIP_AUTH = process.argv.includes("--no-auth")
 
 const CONCURRENCY = 4
 const BASE_URL = `http://localhost:${PORT}`
@@ -148,16 +150,19 @@ async function main() {
 
   const browser = await chromium.launch()
 
-  // Sign in via the dev login UI so we get a real session cookie
-  const authCtx = await browser.newContext()
-  const authPage = await authCtx.newPage()
-  await authPage.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" })
-  // Click "Staff (vendor + admin)" persona button
-  await authPage.click("button:has-text('Staff')")
-  await authPage.waitForURL(/\/home|\/getting-started/, { timeout: 10000 })
-  const cookies = await authCtx.cookies()
-  await authPage.close()
-  await authCtx.close()
+  // Sign in via the dev login UI so we get a real session cookie.
+  // Skip when rendering against a static offline export (auth is bypassed there).
+  let cookies: Cookie[] = []
+  if (!SKIP_AUTH) {
+    const authCtx = await browser.newContext()
+    const authPage = await authCtx.newPage()
+    await authPage.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" })
+    await authPage.click("button:has-text('Staff')")
+    await authPage.waitForURL(/\/home|\/getting-started/, { timeout: 10000 })
+    cookies = await authCtx.cookies()
+    await authPage.close()
+    await authCtx.close()
+  }
 
   const results: Array<{ page: PageEntry; file: string }> = []
 

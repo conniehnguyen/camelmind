@@ -37,5 +37,5 @@ npx tsx scripts/generate-pdfs.ts --port="$PORT" --out="$PAGES_DIR"
 echo "  → Assembling master PDF..."
 npx tsx scripts/generate-master-pdf.ts --version="$VERSION" --pages="$PAGES_DIR" --out="$ROOT/offline-builds"
 
-SIZE=$(du -sh "$ROOT/offline-builds/Game-Warden-Help-Center-${VERSION}.pdf" | cut -f1)
-echo "✓ Done: offline-builds/Game-Warden-Help-Center-${VERSION}.pdf ($SIZE)"
+SIZE=$(du -sh "$ROOT/offline-builds/camelmind-${VERSION}.pdf" | cut -f1)
+echo "✓ Done: offline-builds/camelmind-${VERSION}.pdf ($SIZE)"

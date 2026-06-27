@@ -50,7 +50,17 @@ restore_routes() {
 }
 
 # Always restore on exit (even on error)
-trap restore_routes EXIT
+PAGES_DIR="$ROOT/.pdf-pages"
+
+cleanup() {
+  restore_routes
+  rm -rf "$PAGES_DIR"
+  # Kill the static server if still running
+  if [[ -n "${STATIC_PID:-}" ]]; then
+    kill "$STATIC_PID" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
 
 echo "▶ Building offline package for version: $VERSION"
 
@@ -182,7 +192,28 @@ NOTES
   Do not redistribute without authorization.
 EOF
 
-# 4. Zip the output
+# 4. Generate PDF from the static export
+echo "  → Generating PDF..."
+STATIC_PORT=8766
+
+# Serve the static output on a temporary port
+python3 -m http.server "$STATIC_PORT" --directory "$OUT_DIR" >/dev/null 2>&1 &
+STATIC_PID=$!
+
+# Wait up to 10s for the server to be ready
+for i in $(seq 1 20); do
+  if curl -s -o /dev/null "http://localhost:$STATIC_PORT/home/"; then break; fi
+  sleep 0.5
+done
+
+npx tsx scripts/generate-pdfs.ts --port="$STATIC_PORT" --out="$PAGES_DIR" --no-auth
+npx tsx scripts/generate-master-pdf.ts --version="$VERSION" --pages="$PAGES_DIR" --out="$BUILDS_DIR"
+
+kill "$STATIC_PID" 2>/dev/null || true
+unset STATIC_PID
+rm -rf "$PAGES_DIR"
+
+# 5. Zip the output
 echo "  → Packaging..."
 mkdir -p "$BUILDS_DIR"
 cd "$OUT_DIR"
