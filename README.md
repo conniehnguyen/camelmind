@@ -230,6 +230,74 @@ Humans see the click-through steps. LLMs see the CLI command. Both tags are avai
 
 ---
 
+## Offline Package and PDF Export (Optional)
+
+CamelMind can build a self-contained offline ZIP and a master PDF for any stable version. Both are generated together by one script and made available to users directly from the version selector in the top nav.
+
+### Build the artifacts
+
+```bash
+./scripts/build-offline.sh           # defaults to your first stable version
+./scripts/build-offline.sh latest    # explicit version ID
+./scripts/build-offline.sh v2        # any stable version ID from versions.yml
+```
+
+**Output:**
+```
+offline-builds/
+  camelmind-<version>-offline.zip   # self-contained static HTML site
+  camelmind-<version>.pdf           # single master PDF (cover + ToC + all pages)
+```
+
+The version ID in the filename must match an `id` in `versions.yml`. Builds for unstable versions (`stable: false`) are blocked by the download endpoint.
+
+### What the script does
+
+1. Pre-generates `public/search-index.json` so search works without a server
+2. Stashes server-only routes (`/api/download`, `/api/search`, `/api/raw`, `/api/feedback`, `/api/llms`, `/api/auth`) so `next build` accepts static export mode
+3. Runs `OFFLINE_MODE=true next build` → static HTML in `out/`
+4. Starts a temporary HTTP server on port 8766, renders every doc page with Playwright, and assembles a master PDF (cover page + table of contents + all pages in nav order)
+5. Zips `out/` and moves the PDF to `offline-builds/`
+6. Restores all stashed routes on exit
+
+### How users access them
+
+When the artifacts are present in `offline-builds/`, download icons appear next to each stable version in the top nav version selector:
+
+- **PDF icon** (`FileText`) — downloads `camelmind-<version>.pdf`
+- **ZIP icon** (`Download`) — downloads `camelmind-<version>-offline.zip`
+
+The icons show to **any visitor** when auth is disabled, and to **logged-in users only** when auth is enabled. The download endpoint (`/api/download`) enforces this automatically.
+
+Users unzip the package and run the included launcher:
+
+| Platform | How to open |
+|---|---|
+| Mac / Linux | Double-click `launch.sh`, or run `./launch.sh` in Terminal |
+| Windows | Double-click `launch.bat` |
+
+This starts a local HTTP server on port 8765 and opens the browser automatically. No internet required.
+
+### What changes in the offline package
+
+| Feature | Live site | Offline package |
+|---|---|---|
+| Auth | SSO / RBAC as configured | Bypassed — full access granted at build time |
+| Search | Server-side `/api/search` | Pre-built `search-index.json` |
+| "View / Download Markdown" buttons | Available | Hidden (no server) |
+| "Download PDF" button | Available (where configured) | Available |
+
+Because auth is bypassed in the offline build, the ZIP contains **all pages** regardless of role. Only distribute offline packages to users who already have access.
+
+### Build only the PDF (against a live dev server)
+
+```bash
+npm run dev                    # terminal 1 — must be running
+./scripts/build-pdf.sh         # terminal 2 — renders against localhost:3000
+```
+
+---
+
 ## Authentication (Optional)
 
 Auth is **disabled by default**. When enabled, CamelMind supports:
