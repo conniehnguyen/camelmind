@@ -21,6 +21,8 @@ SERVER_ROUTES=(
   "app/api/raw/route.ts"
   "app/api/download/route.ts"
   "app/api/search/route.ts"
+  "app/api/feedback/route.ts"
+  "app/api/llms"
   "app/api/auth"
 )
 
