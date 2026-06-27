@@ -56,7 +56,6 @@ async function buildCoverPage(doc: PDFDocument): Promise<PDFPage> {
     size: 9,
     font: regularFont,
     color: rgb(0.6, 0.65, 0.75),
-    characterSpacing: 2,
   })
 
   // Main title
@@ -100,7 +99,6 @@ async function buildCoverPage(doc: PDFDocument): Promise<PDFPage> {
     size: 8,
     font: regularFont,
     color: MID,
-    characterSpacing: 0.5,
   })
   page.drawText("CONFIDENTIAL — FOR AUTHORIZED USERS ONLY", {
     x: PW - MARGIN - 220,
@@ -126,7 +124,7 @@ async function buildTocPage(
 
   const drawPageHeader = (p: PDFPage) => {
     p.drawText("TABLE OF CONTENTS", {
-      x: MARGIN, y: PH - MARGIN + 10, size: 8, font: regularFont, color: MID, characterSpacing: 1.5
+      x: MARGIN, y: PH - MARGIN + 10, size: 8, font: regularFont, color: MID,
     })
     p.drawLine({ start: { x: MARGIN, y: PH - MARGIN - 4 }, end: { x: PW - MARGIN, y: PH - MARGIN - 4 }, thickness: 0.5, color: rgb(0.85, 0.85, 0.85) })
   }
@@ -152,7 +150,7 @@ async function buildTocPage(
     if (entry.group !== lastGroup) {
       if (lastGroup !== "") y -= 6
       page.drawText(entry.group.toUpperCase(), {
-        x: MARGIN, y, size: 7.5, font: boldFont, color: MID, characterSpacing: 1,
+        x: MARGIN, y, size: 7.5, font: boldFont, color: MID,
       })
       y -= 18
       lastGroup = entry.group
