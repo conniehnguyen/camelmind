@@ -86,6 +86,9 @@ cd "$(dirname "$0")"
 PORT=8765
 URL="http://localhost:$PORT/home/"
 
+# Free the port if a previous server is still running
+lsof -ti:$PORT 2>/dev/null | xargs kill 2>/dev/null || true
+
 # Try Python 3 first (available on most systems without internet)
 if command -v python3 &>/dev/null; then
   echo "Starting local server on $URL"
