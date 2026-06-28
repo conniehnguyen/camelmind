@@ -232,69 +232,80 @@ Humans see the click-through steps. LLMs see the CLI command. Both tags are avai
 
 ## Offline Package and PDF Export (Optional)
 
-CamelMind can build a self-contained offline ZIP and a master PDF for any stable version. Both are generated together by one script and made available to users directly from the version selector in the top nav.
+CamelMind can produce a self-contained offline ZIP and a master PDF for any stable version. Users download them directly from the version selector in the top nav — no account or internet connection required after download.
 
-### Build the artifacts
+---
+
+### For doc owners: enabling the feature
+
+The offline package and PDF are not generated on demand. You build them once (or in CI on each release) and the download links appear automatically on the live site.
+
+**Step 1 — Build the artifacts**
 
 ```bash
-./scripts/build-offline.sh           # defaults to your first stable version
-./scripts/build-offline.sh latest    # explicit version ID
-./scripts/build-offline.sh v2        # any stable version ID from versions.yml
+./scripts/build-offline.sh latest    # version ID must match an id in versions.yml
+./scripts/build-offline.sh v2        # build a specific version
 ```
 
-**Output:**
+This produces two files in `offline-builds/`:
+
 ```
 offline-builds/
   camelmind-<version>-offline.zip   # self-contained static HTML site
-  camelmind-<version>.pdf           # single master PDF (cover + ToC + all pages)
+  camelmind-<version>.pdf           # master PDF: cover + table of contents + all pages
 ```
 
-The version ID in the filename must match an `id` in `versions.yml`. Builds for unstable versions (`stable: false`) are blocked by the download endpoint.
+> The build runs a full `next build` static export and requires Playwright for PDF rendering. It cannot run while `npm run dev` is active on the same machine.
 
-### What the script does
+**Step 2 — Start the server**
 
-1. Pre-generates `public/search-index.json` so search works without a server
-2. Stashes server-only routes (`/api/download`, `/api/search`, `/api/raw`, `/api/feedback`, `/api/llms`, `/api/auth`) so `next build` accepts static export mode
-3. Runs `OFFLINE_MODE=true next build` → static HTML in `out/`
-4. Starts a temporary HTTP server on port 8766, renders every doc page with Playwright, and assembles a master PDF (cover page + table of contents + all pages in nav order)
-5. Zips `out/` and moves the PDF to `offline-builds/`
-6. Restores all stashed routes on exit
+```bash
+npm run dev    # or deploy to production
+```
 
-### How users access them
+Once the server is running and `offline-builds/` contains the artifacts, download icons appear automatically next to each stable version in the top nav:
 
-When the artifacts are present in `offline-builds/`, download icons appear next to each stable version in the top nav version selector:
+- **PDF icon** — downloads the master PDF
+- **ZIP icon** — downloads the offline package
 
-- **PDF icon** (`FileText`) — downloads `camelmind-<version>.pdf`
-- **ZIP icon** (`Download`) — downloads `camelmind-<version>-offline.zip`
+The icons are visible to **all visitors** when auth is disabled, and to **logged-in users only** when auth is enabled.
 
-The icons show to **any visitor** when auth is disabled, and to **logged-in users only** when auth is enabled. The download endpoint (`/api/download`) enforces this automatically.
+**Keeping artifacts up to date**
 
-Users unzip the package and run the included launcher:
+Rebuild whenever content changes significantly. The artifacts persist across server restarts — you only need to rebuild to refresh the content inside them.
 
-| Platform | How to open |
+In production, run the build script in CI as part of your release process and deploy `offline-builds/` alongside the app.
+
+**A note on restricted content**
+
+Auth is bypassed at build time, so the offline ZIP and PDF contain **all pages** regardless of role. Only distribute offline packages to users who already have access to your site.
+
+---
+
+### For end users: downloading and running the offline site
+
+**Download**
+
+On the live doc site, hover over the version label in the top nav. Click the **download icon** (↓) next to the version you want.
+
+- ZIP icon → offline site package
+- PDF icon → single PDF of all docs
+
+**Run the offline site (ZIP)**
+
+1. Unzip the downloaded file — macOS will extract it automatically when you double-click it.
+2. Open the extracted folder and run the launcher:
+
+| Platform | Steps |
 |---|---|
 | Mac / Linux | Double-click `launch.sh`, or run `./launch.sh` in Terminal |
 | Windows | Double-click `launch.bat` |
 
-This starts a local HTTP server on port 8765 and opens the browser automatically. No internet required.
+The launcher starts a local server and opens [http://localhost:8765/home/](http://localhost:8765/home/) in your browser automatically.
 
-### What changes in the offline package
+3. Press `Ctrl+C` in the Terminal window to stop the server when you're done.
 
-| Feature | Live site | Offline package |
-|---|---|---|
-| Auth | SSO / RBAC as configured | Bypassed — full access granted at build time |
-| Search | Server-side `/api/search` | Pre-built `search-index.json` |
-| "View / Download Markdown" buttons | Available | Hidden (no server) |
-| "Download PDF" button | Available (where configured) | Available |
-
-Because auth is bypassed in the offline build, the ZIP contains **all pages** regardless of role. Only distribute offline packages to users who already have access.
-
-### Build only the PDF (against a live dev server)
-
-```bash
-npm run dev                    # terminal 1 — must be running
-./scripts/build-pdf.sh         # terminal 2 — renders against localhost:3000
-```
+**No internet connection required** once the package is downloaded. Search, navigation, and all content work fully offline.
 
 ---
 
