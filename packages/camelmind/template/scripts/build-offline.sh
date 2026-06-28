@@ -69,7 +69,8 @@ OFFLINE_MODE=true TARGET_VERSION="$VERSION" npx next build
 
 cat > "$OUT_DIR/launch.sh" <<'LAUNCHER'
 #!/usr/bin/env bash
-# Game Warden Help Center — offline launcher (Mac / Linux)
+# Offline docs launcher (Mac / Linux)
+cd "$(dirname "$0")"
 PORT=8765
 URL="http://localhost:$PORT/home/"
 
@@ -113,7 +114,8 @@ chmod +x "$OUT_DIR/launch.sh"
 
 cat > "$OUT_DIR/launch.bat" <<'LAUNCHER'
 @echo off
-REM Game Warden Help Center — offline launcher (Windows)
+REM Offline docs launcher (Windows)
+cd /D "%~dp0"
 set PORT=8765
 set URL=http://localhost:%PORT%/home/
 
