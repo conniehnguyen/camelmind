@@ -284,16 +284,26 @@ Auth is bypassed at build time, so the offline ZIP and PDF contain **all pages**
 
 ### For end users: downloading and running the offline site
 
-**Download**
+**Step 1 — Sign in (if your site requires it)**
 
-On the live doc site, hover over the version label in the top nav. Click the **download icon** (↓) next to the version you want.
+If the doc site is behind authentication, the download icons are only visible after you log in. Sign in with your credentials, then proceed to the version selector.
 
-- ZIP icon → offline site package
-- PDF icon → single PDF of all docs
+If the site is public, no sign-in is needed.
 
-**Run the offline site (ZIP)**
+**Step 2 — Download**
 
-1. Unzip the downloaded file — macOS will extract it automatically when you double-click it.
+Hover over the version label in the top nav. Click the icon next to the version you want:
+
+- **ZIP icon** (↓) → offline site package
+- **PDF icon** → single PDF of all docs
+
+The download starts immediately in your browser.
+
+> **Restricted content:** the offline package and PDF include all pages you have access to — including any role-restricted content — because access was verified when you downloaded the file. No further login is required once you have the package.
+
+**Step 3 — Run the offline site (ZIP)**
+
+1. Unzip the downloaded file — macOS extracts it automatically when you double-click it.
 2. Open the extracted folder and run the launcher:
 
 | Platform | Steps |
@@ -301,7 +311,7 @@ On the live doc site, hover over the version label in the top nav. Click the **d
 | Mac / Linux | Double-click `launch.sh`, or run `./launch.sh` in Terminal |
 | Windows | Double-click `launch.bat` |
 
-The launcher starts a local server and opens [http://localhost:8765/home/](http://localhost:8765/home/) in your browser automatically.
+The launcher starts a local server and opens [http://localhost:8765/home/](http://localhost:8765/home/) in your browser automatically. All content — including restricted pages — is accessible without signing in again.
 
 3. Press `Ctrl+C` in the Terminal window to stop the server when you're done.
 
