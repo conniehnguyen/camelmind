@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-VERSION=${1:-v2.0}
+VERSION=${1:-latest}
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT_DIR="$ROOT/out"
 BUILDS_DIR="$ROOT/offline-builds"
@@ -21,6 +21,8 @@ SERVER_ROUTES=(
   "app/api/raw/route.ts"
   "app/api/download/route.ts"
   "app/api/search/route.ts"
+  "app/api/feedback/route.ts"
+  "app/api/llms"
   "app/api/auth"
 )
 
@@ -48,7 +50,17 @@ restore_routes() {
 }
 
 # Always restore on exit (even on error)
-trap restore_routes EXIT
+PAGES_DIR="$ROOT/.pdf-pages"
+
+cleanup() {
+  restore_routes
+  rm -rf "$PAGES_DIR"
+  # Kill the static server if still running
+  if [[ -n "${STATIC_PID:-}" ]]; then
+    kill "$STATIC_PID" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
 
 echo "▶ Building offline package for version: $VERSION"
 
@@ -69,9 +81,13 @@ OFFLINE_MODE=true TARGET_VERSION="$VERSION" npx next build
 
 cat > "$OUT_DIR/launch.sh" <<'LAUNCHER'
 #!/usr/bin/env bash
-# Game Warden Help Center — offline launcher (Mac / Linux)
+# CamelMind offline launcher (Mac / Linux)
+cd "$(dirname "$0")"
 PORT=8765
 URL="http://localhost:$PORT/home/"
+
+# Free the port if a previous server is still running
+lsof -ti:$PORT 2>/dev/null | xargs kill 2>/dev/null || true
 
 # Try Python 3 first (available on most systems without internet)
 if command -v python3 &>/dev/null; then
@@ -113,7 +129,8 @@ chmod +x "$OUT_DIR/launch.sh"
 
 cat > "$OUT_DIR/launch.bat" <<'LAUNCHER'
 @echo off
-REM Game Warden Help Center — offline launcher (Windows)
+REM CamelMind offline launcher (Windows)
+cd /D "%~dp0"
 set PORT=8765
 set URL=http://localhost:%PORT%/home/
 
@@ -180,7 +197,28 @@ NOTES
   Do not redistribute without authorization.
 EOF
 
-# 4. Zip the output
+# 4. Generate PDF from the static export
+echo "  → Generating PDF..."
+STATIC_PORT=8766
+
+# Serve the static output on a temporary port
+python3 -m http.server "$STATIC_PORT" --directory "$OUT_DIR" >/dev/null 2>&1 &
+STATIC_PID=$!
+
+# Wait up to 10s for the server to be ready
+for i in $(seq 1 20); do
+  if curl -s -o /dev/null "http://localhost:$STATIC_PORT/home/"; then break; fi
+  sleep 0.5
+done
+
+npx tsx scripts/generate-pdfs.ts --port="$STATIC_PORT" --out="$PAGES_DIR" --no-auth
+npx tsx scripts/generate-master-pdf.ts --version="$VERSION" --pages="$PAGES_DIR" --out="$BUILDS_DIR"
+
+kill "$STATIC_PID" 2>/dev/null || true
+unset STATIC_PID
+rm -rf "$PAGES_DIR"
+
+# 5. Zip the output
 echo "  → Packaging..."
 mkdir -p "$BUILDS_DIR"
 cd "$OUT_DIR"

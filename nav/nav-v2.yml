@@ -1,0 +1,12 @@
+nav:
+  - label: "Getting Started"
+    dropdown: true
+    items:
+      - label: "Overview"
+        slug: /v2/overview
+        file: content/v2/overview.mdx
+        roles: []
+      - label: "Quickstart"
+        slug: /v2/quickstart
+        file: content/v2/quickstart.mdx
+        roles: []

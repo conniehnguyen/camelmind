@@ -84,30 +84,41 @@ See the [Configuration Reference](/reference/configuration) for all options.
 
 ## API Reference (Optional)
 
-CamelMind can render an interactive API reference from an OpenAPI 3.x spec alongside your documentation.
+CamelMind can render an interactive API reference from one or more OpenAPI 3.x specs alongside your documentation.
 
-### Enable it
+### 1. Declare your specs
 
-Add `apiReference` to `camelmind.config.ts`:
+Add `apiReference` to `camelmind.config.ts`. The `specs` object is a named registry — each key is an identifier you choose, used to reference the spec from `versions.yml`:
 
 ```typescript
 export default {
   title: "My Docs",
   apiReference: {
     enabled: true,
-    spec: "api/openapi.yml",       // path to your OpenAPI spec (relative to project root)
-    navLabel: "API Reference",     // label shown in the top nav
+    navLabel: "API Reference",
     languages: ["curl", "python", "javascript", "go"],  // code sample languages
-    roles: [],                     // [] = anyone logged in; ["admin"] = role-gated
+    roles: [],                                           // [] = anyone logged in; ["admin"] = role-gated
+    specs: {
+      "main-api": {
+        label: "Main API",         // shown in the tab switcher
+        file: "api/openapi.yml",   // path relative to project root
+      },
+      "partner-api": {
+        label: "Partner API",
+        file: "api/openapi-partner.yml",
+      },
+    },
   },
 }
 ```
 
-Place your spec file at the path you set (e.g. `api/openapi.yml`). The API Reference will appear in the top nav and be served at `/api-reference`.
+The API Reference appears in the top nav and is served at `/api-reference`.
 
-### Per-version specs
+### 2. Assign specs to versions
 
-If you have multiple doc versions, each version can point to its own OpenAPI spec via `versions.yml`:
+In `versions.yml`, each version can reference a single spec or show multiple specs in tabs.
+
+**Single spec per version:**
 
 ```yaml
 versions:
@@ -116,29 +127,50 @@ versions:
     stable: true
     nav: nav/nav-v2.0.yml
     api_reference:
-      spec: api/openapi-v2.0.yml        # version-specific spec
+      spec: main-api              # key from camelmind.config.ts specs
+```
 
+**Multiple specs as tabs (URL-based, deep-linkable):**
+
+```yaml
   - id: "v1.9"
     label: "v1.9"
     stable: true
     nav: nav/nav-v1.9.yml
     api_reference:
-      spec: api/openapi-v1.9.yml
+      tabs:
+        - id: main                # becomes a URL segment: /api-reference/v1.9/main/...
+          spec: main-api
+        - id: partner
+          spec: partner-api
+```
 
+**Disable API Reference for a version:**
+
+```yaml
   - id: "dev"
     label: "dev"
     stable: false
     nav: nav/nav-dev.yml
-    api_reference: false                # hide API Reference for this version
+    api_reference: false          # hides the link; URL returns 404
 ```
 
 | `api_reference` value | Behavior |
 |---|---|
-| omitted | Uses the site-level spec from `camelmind.config.ts` |
-| `false` | Hides the API Reference link; URL returns 404 |
-| `{ spec: "..." }` | Loads a version-specific OpenAPI spec |
+| omitted or `true` | Uses the first spec declared in `specs` |
+| `false` | Hides the API Reference for this version |
+| `{ spec: "key" }` | Shows a single named spec |
+| `{ tabs: [...] }` | Shows multiple specs with a tab switcher in the sidebar |
 
-Versioned API Reference is served at `/api-reference/<version>/tag/operationId` (e.g. `/api-reference/v2.0/applications/create`).
+### URL structure
+
+| Setup | URL pattern |
+|---|---|
+| Single spec, no version | `/api-reference/tag/operationId` |
+| Single spec, versioned | `/api-reference/v2.0/tag/operationId` |
+| Tabs, versioned | `/api-reference/v1.9/main/tag/operationId` |
+
+Each tab has its own URL, making every endpoint deep-linkable and shareable.
 
 ---
 
@@ -195,6 +227,95 @@ cm env create --name my-env
 ```
 
 Humans see the click-through steps. LLMs see the CLI command. Both tags are available in every MDX file — no imports needed.
+
+---
+
+## Offline Package and PDF Export (Optional)
+
+CamelMind can produce a self-contained offline ZIP and a master PDF for any stable version. Users download them directly from the version selector in the top nav — no account or internet connection required after download.
+
+---
+
+### For doc owners: enabling the feature
+
+The offline package and PDF are not generated on demand. You build them once (or in CI on each release) and the download links appear automatically on the live site.
+
+**Step 1 — Build the artifacts**
+
+```bash
+./scripts/build-offline.sh latest    # version ID must match an id in versions.yml
+./scripts/build-offline.sh v2        # build a specific version
+```
+
+This produces two files in `offline-builds/`:
+
+```
+offline-builds/
+  camelmind-<version>-offline.zip   # self-contained static HTML site
+  camelmind-<version>.pdf           # master PDF: cover + table of contents + all pages
+```
+
+> The build runs a full `next build` static export and requires Playwright for PDF rendering. It cannot run while `npm run dev` is active on the same machine.
+
+**Step 2 — Start the server**
+
+```bash
+npm run dev    # or deploy to production
+```
+
+Once the server is running and `offline-builds/` contains the artifacts, download icons appear automatically next to each stable version in the top nav:
+
+- **PDF icon** — downloads the master PDF
+- **ZIP icon** — downloads the offline package
+
+The icons are visible to **all visitors** when auth is disabled, and to **logged-in users only** when auth is enabled.
+
+**Keeping artifacts up to date**
+
+Rebuild whenever content changes significantly. The artifacts persist across server restarts — you only need to rebuild to refresh the content inside them.
+
+In production, run the build script in CI as part of your release process and deploy `offline-builds/` alongside the app.
+
+**A note on restricted content**
+
+Auth is bypassed at build time, so the offline ZIP and PDF contain **all pages** regardless of role. Only distribute offline packages to users who already have access to your site.
+
+---
+
+### For end users: downloading and running the offline site
+
+**Step 1 — Sign in (if your site requires it)**
+
+If the doc site is behind authentication, the download icons are only visible after you log in. Sign in with your credentials, then proceed to the version selector.
+
+If the site is public, no sign-in is needed.
+
+**Step 2 — Download**
+
+Hover over the version label in the top nav. Click the icon next to the version you want:
+
+- **ZIP icon** (↓) → offline site package
+- **PDF icon** → single PDF of all docs
+
+The download starts immediately in your browser.
+
+> **Restricted content:** the offline package and PDF include all pages you have access to — including any role-restricted content — because access was verified when you downloaded the file. No further login is required once you have the package.
+
+**Step 3 — Run the offline site (ZIP)**
+
+1. Unzip the downloaded file — macOS extracts it automatically when you double-click it.
+2. Open the extracted folder and run the launcher:
+
+| Platform | Steps |
+|---|---|
+| Mac / Linux | Double-click `launch.sh`, or run `./launch.sh` in Terminal |
+| Windows | Double-click `launch.bat` |
+
+The launcher starts a local server and opens [http://localhost:8765/home/](http://localhost:8765/home/) in your browser automatically. All content — including restricted pages — is accessible without signing in again.
+
+3. Press `Ctrl+C` in the Terminal window to stop the server when you're done.
+
+**No internet connection required** once the package is downloaded. Search, navigation, and all content work fully offline.
 
 ---
 

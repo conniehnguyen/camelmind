@@ -1,0 +1,33 @@
+---
+title: "Quickstart"
+description: "Get up and running with v2 in minutes."
+---
+
+# Quickstart
+
+## Prerequisites
+
+- A Camel Trading Company account (v2 plan or higher)
+- An API key from your [Merchant Dashboard](https://dashboard.cameltrading.example)
+- A Partner API key if you're accessing the Partner Network API
+
+## Make your first request
+
+Fetch your caravans:
+
+```bash
+curl https://api.cameltrading.example/v1/caravans \
+  -H "Authorization: Bearer <your-token>"
+```
+
+Fetch shared routes from the Partner Network:
+
+```bash
+curl https://partners.cameltrading.example/v2/routes \
+  -H "X-Partner-Key: <your-partner-key>"
+```
+
+## Next steps
+
+- Browse the [Core API Reference](/api-reference/v2/main) for caravan, cargo, and order endpoints
+- Browse the [Partner Network API Reference](/api-reference/v2/partner) for route, waypoint, and event endpoints

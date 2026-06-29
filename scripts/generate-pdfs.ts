@@ -13,6 +13,9 @@ import { SignJWT } from "jose"
 import fs from "fs"
 import path from "path"
 import yaml from "js-yaml"
+import config from "../camelmind.config"
+
+const SITE_TITLE = config.title
 
 const ROOT = path.resolve(process.cwd())
 const NAV_FILE = path.join(ROOT, "nav", "nav.yml")
@@ -21,6 +24,8 @@ const PORT = parseInt(process.argv.find((a) => a.startsWith("--port="))?.split("
 const OUT_DIR = process.argv.find((a) => a.startsWith("--out="))?.split("=")[1]
   ? path.resolve(process.argv.find((a) => a.startsWith("--out="))!.split("=")[1])
   : path.join(ROOT, ".pdf-pages")
+// --no-auth: skip the login step (use when rendering a static offline export where auth is bypassed)
+const SKIP_AUTH = process.argv.includes("--no-auth")
 
 const CONCURRENCY = 4
 const BASE_URL = `http://localhost:${PORT}`
@@ -110,7 +115,7 @@ async function generatePage(
       headerTemplate: `
         <div style="width:100%;font-family:system-ui,sans-serif;font-size:8px;color:#6b7280;display:flex;justify-content:space-between;padding:0 16mm;">
           <span>${page.group}${page.section ? " › " + page.section : ""}</span>
-          <span style="color:#111827;font-weight:600;">Game Warden Help Center</span>
+          <span style="color:#111827;font-weight:600;">${SITE_TITLE}</span>
         </div>`,
       footerTemplate: `
         <div style="width:100%;font-family:system-ui,sans-serif;font-size:8px;color:#6b7280;display:flex;justify-content:space-between;padding:0 16mm;">
@@ -148,16 +153,19 @@ async function main() {
 
   const browser = await chromium.launch()
 
-  // Sign in via the dev login UI so we get a real session cookie
-  const authCtx = await browser.newContext()
-  const authPage = await authCtx.newPage()
-  await authPage.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" })
-  // Click "Staff (vendor + admin)" persona button
-  await authPage.click("button:has-text('Staff')")
-  await authPage.waitForURL(/\/home|\/getting-started/, { timeout: 10000 })
-  const cookies = await authCtx.cookies()
-  await authPage.close()
-  await authCtx.close()
+  // Sign in via the dev login UI so we get a real session cookie.
+  // Skip when rendering against a static offline export (auth is bypassed there).
+  let cookies: Cookie[] = []
+  if (!SKIP_AUTH) {
+    const authCtx = await browser.newContext()
+    const authPage = await authCtx.newPage()
+    await authPage.goto(`${BASE_URL}/login`, { waitUntil: "networkidle" })
+    await authPage.click("button:has-text('Staff')")
+    await authPage.waitForURL(/\/home|\/getting-started/, { timeout: 10000 })
+    cookies = await authCtx.cookies()
+    await authPage.close()
+    await authCtx.close()
+  }
 
   const results: Array<{ page: PageEntry; file: string }> = []
 

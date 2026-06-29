@@ -21,6 +21,14 @@ export function VersionSelector({ versions, currentVersionId, currentSlug, versi
 
   function navigateToVersion(targetId: string) {
     setOpen(false)
+
+    // API reference pages use a different URL scheme (/api-reference/[version]/...)
+    // so navigate directly to the target version's API reference overview
+    if (currentSlug.startsWith("/api-reference")) {
+      router.push(`/api-reference/${targetId}`)
+      return
+    }
+
     const bare = currentVersionId
       ? currentSlug.replace(new RegExp(`^/${currentVersionId}`), "") || "/"
       : currentSlug

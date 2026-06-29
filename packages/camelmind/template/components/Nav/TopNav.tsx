@@ -132,7 +132,7 @@ export function TopNav({ nav, userRoles, userName, authEnabled = false, versions
               currentVersionId={currentVersionId}
               currentSlug={currentSlug}
               versionSlugs={versionSlugs}
-              isLoggedIn={!!userName}
+              isLoggedIn={!!userName || !authEnabled}
             />
             {authEnabled && (
               userName ? (

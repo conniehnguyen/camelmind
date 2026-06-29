@@ -71,7 +71,7 @@ export default async function DocPage({ params }: Props) {
   const currentVersion = versions.find((v) => v.id === versionId)
   const versionShowsApiRef = currentVersion ? (currentVersion.api_reference !== false) : true
   const apiRef = apiRefConfig?.enabled && versionShowsApiRef
-    ? { label: apiRefConfig.navLabel ?? "API Reference", href: "/api-reference", roles: apiRefConfig.roles ?? [] }
+    ? { label: apiRefConfig.navLabel ?? "API Reference", href: versionId ? `/api-reference/${versionId}` : "/api-reference", roles: apiRefConfig.roles ?? [] }
     : null
 
   if (shouldRedirectToLogin(navEntry.roles, session)) {

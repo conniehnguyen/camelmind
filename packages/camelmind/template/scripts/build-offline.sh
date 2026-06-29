@@ -69,9 +69,13 @@ OFFLINE_MODE=true TARGET_VERSION="$VERSION" npx next build
 
 cat > "$OUT_DIR/launch.sh" <<'LAUNCHER'
 #!/usr/bin/env bash
-# Game Warden Help Center — offline launcher (Mac / Linux)
+# Offline docs launcher (Mac / Linux)
+cd "$(dirname "$0")"
 PORT=8765
 URL="http://localhost:$PORT/home/"
+
+# Free the port if a previous server is still running
+lsof -ti:$PORT 2>/dev/null | xargs kill 2>/dev/null || true
 
 # Try Python 3 first (available on most systems without internet)
 if command -v python3 &>/dev/null; then
@@ -113,7 +117,8 @@ chmod +x "$OUT_DIR/launch.sh"
 
 cat > "$OUT_DIR/launch.bat" <<'LAUNCHER'
 @echo off
-REM Game Warden Help Center — offline launcher (Windows)
+REM Offline docs launcher (Windows)
+cd /D "%~dp0"
 set PORT=8765
 set URL=http://localhost:%PORT%/home/
 

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 
 info:
-  title: Camel Trading Company API
+  title: Camel Trading
   version: v1
   description: |
     The Camel Trading Company API provides programmatic access to desert caravans,
