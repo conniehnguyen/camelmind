@@ -38,6 +38,36 @@ Organize files however you like under `content/`. The folder structure does not 
   roles: []
 ```
 
+## Collapsible sections
+
+Use the `<Details>` component to create collapsible content blocks. Always use the uppercase `<Details>` tag — the lowercase HTML `<details>` tag does not process markdown inside it.
+
+```mdx
+<Details summary="Summary text goes here">
+  Any markdown content — **bold**, `code`, lists, etc.
+</Details>
+```
+
+Add an `id` prop to make the section anchor-linkable. Sharing the URL with a `#hash` will auto-open and scroll to that section:
+
+```mdx
+<Details id="my-section" summary="Advanced configuration">
+  Content here.
+</Details>
+```
+
+**Example:**
+
+<Details id="example-details" summary="What counts as a breaking change?">
+  A breaking change is any modification that requires existing users to update their workflow:
+
+  - Renamed or removed nav slugs
+  - Changed frontmatter fields that other tooling depends on
+  - Restructured `nav.yml` keys
+
+  Minor wording edits and new pages are **not** breaking changes.
+</Details>
+
 ## Images
 
 Place static assets in `public/` and reference them in Markdown:
