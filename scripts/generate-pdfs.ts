@@ -18,7 +18,13 @@ import config from "../camelmind.config"
 const SITE_TITLE = config.title
 
 const ROOT = path.resolve(process.cwd())
-const NAV_FILE = path.join(ROOT, "nav", "nav.yml")
+
+// Resolve the latest stable version's nav file from versions.yml
+const { versions: _versions } = yaml.load(fs.readFileSync(path.join(ROOT, "versions.yml"), "utf-8")) as {
+  versions: { id: string; stable: boolean; nav: string }[]
+}
+const _latestVersion = _versions.find((v) => v.stable) ?? _versions[0]
+const NAV_FILE = path.join(ROOT, _latestVersion.nav)
 
 const PORT = parseInt(process.argv.find((a) => a.startsWith("--port="))?.split("=")[1] ?? "3000")
 const OUT_DIR = process.argv.find((a) => a.startsWith("--out="))?.split("=")[1]

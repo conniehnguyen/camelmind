@@ -8,11 +8,59 @@ export { isNavGroup } from "./nav-types"
 
 let _navCache: NavConfig | null = null
 
+function stripPrefix(slug: string, prefix: string): string {
+  if (slug.startsWith(prefix + "/")) return slug.slice(prefix.length)
+  if (slug === prefix) return "/"
+  return slug
+}
+
+function stripNavPrefix(nav: NavConfig, prefix: string): NavConfig {
+  const s = (slug: string) => stripPrefix(slug, prefix)
+
+  const walkChildren = (children: NavChild[]): NavChild[] =>
+    children.map((c) => ({
+      ...c,
+      slug: s(c.slug),
+      children: c.children ? walkChildren(c.children) : undefined,
+    }))
+
+  const walkEntries = (entries: NavEntry[]): NavEntry[] =>
+    entries.map((e) => ({
+      ...e,
+      slug: s(e.slug),
+      section: e.section ? walkChildren(e.section) : undefined,
+    }))
+
+  return {
+    nav: nav.nav.map((item) => {
+      if ("dropdown" in item) {
+        const group = item as NavGroup
+        return {
+          ...group,
+          ...(group.slug ? { slug: s(group.slug) } : {}),
+          items: group.items ? walkEntries(group.items) : undefined,
+        }
+      }
+      const entry = item as NavEntry
+      return { ...entry, slug: s(entry.slug) }
+    }),
+  } as NavConfig
+}
+
 export function loadNav(): NavConfig {
   if (process.env.NODE_ENV !== "development" && _navCache) return _navCache
-  const navPath = path.join(process.cwd(), "nav", "nav.yml")
-  const raw = fs.readFileSync(navPath, "utf-8")
-  _navCache = yaml.load(raw) as NavConfig
+
+  // Derive the unversioned nav from the first stable version in versions.yml,
+  // stripping the version prefix from all slugs so /v2/foo becomes /foo.
+  const versionsPath = path.join(process.cwd(), "versions.yml")
+  const { versions } = yaml.load(fs.readFileSync(versionsPath, "utf-8")) as {
+    versions: { id: string; stable: boolean; nav: string }[]
+  }
+  const latest = versions.find((v) => v.stable) ?? versions[0]
+  const navPath = path.join(process.cwd(), latest.nav)
+  const nav = yaml.load(fs.readFileSync(navPath, "utf-8")) as NavConfig
+
+  _navCache = stripNavPrefix(nav, `/${latest.id}`)
   return _navCache
 }
 
