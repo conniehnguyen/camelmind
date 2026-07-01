@@ -23,10 +23,12 @@ const defaultIcons: Record<CalloutType, string> = {
 export function Callout({
   type = "note",
   icon,
+  title,
   children,
 }: {
   type?: CalloutType
   icon?: string
+  title?: string
   children: React.ReactNode
 }) {
   const iconName = icon ?? defaultIcons[type]
@@ -35,7 +37,7 @@ export function Callout({
     <div className={`callout ${type} my-4`}>
       <div className="callout-header flex items-center gap-1.5">
         <Icon name={iconName} size={13} />
-        {labels[type]}
+        {title ?? labels[type]}
       </div>
       <div className="callout-body">{children}</div>
     </div>
