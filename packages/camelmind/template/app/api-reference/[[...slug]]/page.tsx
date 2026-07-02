@@ -139,11 +139,13 @@ export default async function ApiReferencePage({ params }: Props) {
   const apiRefProp = { label: apiRef.navLabel ?? "API Reference", href: "/api-reference", roles }
   const currentSlug = slug.length ? `${base}/${slug.join("/")}` : base
 
+  // Tab switcher props for sidebar
   const sidebarTabs = resolved.mode === "tabs"
     ? resolved.tabs.map((t) => ({ id: t.id, label: t.label, href: `${versionBase}/${t.id}` }))
     : undefined
   const activeTabId = activeTab?.id
 
+  // Overview page
   if (!slug.length) {
     return (
       <div className="flex flex-col h-screen">
@@ -168,12 +170,14 @@ export default async function ApiReferencePage({ params }: Props) {
     )
   }
 
+  // Tag-only slug → redirect to first endpoint
   if (slug.length === 1) {
     const tag = spec.tags.find((t) => t.slug === slug[0])
     if (!tag || !tag.operations.length) return notFound()
     redirect(`${base}/${tag.slug}/${tag.operations[0].operationId}`)
   }
 
+  // Endpoint page
   const [tagSlug, operationId] = slug
   const op = spec.allOperations.find(
     (o) => o.tagSlug === tagSlug && o.operationId === operationId

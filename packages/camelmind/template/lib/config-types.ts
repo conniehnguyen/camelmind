@@ -35,6 +35,11 @@ export type ApiReferenceConfig = {
   roles?: string[]
 }
 
+export type LlmsConfig = {
+  enabled?: boolean
+  directive?: string
+}
+
 export type CamelMindConfig = {
   title: string
   tagline: string
@@ -48,4 +53,5 @@ export type CamelMindConfig = {
   }
   site?: SiteFeatures
   apiReference?: ApiReferenceConfig
+  llms?: LlmsConfig
 }

@@ -10,8 +10,14 @@ import path from "path"
 import matter from "gray-matter"
 
 const ROOT = path.resolve(process.cwd())
-const NAV_FILE = path.join(ROOT, "nav", "nav.yml")
 const OUT_FILE = path.join(ROOT, "public", "search-index.json")
+
+// Resolve the latest stable version's nav file from versions.yml
+const { versions } = yaml.load(fs.readFileSync(path.join(ROOT, "versions.yml"), "utf-8")) as {
+  versions: { id: string; stable: boolean; nav: string }[]
+}
+const latestVersion = versions.find((v) => v.stable) ?? versions[0]
+const NAV_FILE = path.join(ROOT, latestVersion.nav)
 
 // Minimal YAML parser for our nav structure (avoids pulling in the full Next.js lib graph)
 import yaml from "js-yaml"
